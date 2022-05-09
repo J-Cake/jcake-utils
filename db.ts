@@ -18,12 +18,12 @@ const notNull = function (i: any): i is NonNullable<typeof i> {
         return i !== null && i !== undefined;
 }
 
-type Selector<T, Cache extends Array<PropertyKey> = []> =
+export type Selector<T, Cache extends Array<PropertyKey> = []> =
     T extends PropertyKey ? Cache : {
         [P in keyof T]: [...Cache, P] | Selector<T[P], [...Cache, P]>
     }[keyof T];
 
-type Value<Obj, selector extends Selector<Obj>> = selector extends [infer key] ?
+export type Value<Obj, selector extends Selector<Obj>> = selector extends [infer key] ?
     (key extends keyof Obj ? Obj[key] : never) :
     (selector extends [infer key, ...infer subkey] ?
         (key extends keyof Obj ? (
@@ -292,7 +292,7 @@ export default class DB<Database> {
      * @param predicate Confirm or reject a value
      * @returns the value if it is found, throws error if not found
      */
-    public async find<selector extends Selector<Database>>(selector: selector, predicate: (i: any) => boolean): Promise<any> {
+    public async find<selector extends Selector<Database>>(selector: selector, predicate: (i: any, a: Selector<Database>) => boolean): Promise<any> {
         const _selector = [...selector].map(i => (i as string).toString());
 
         if (!this.file)
@@ -315,7 +315,7 @@ export default class DB<Database> {
 
         for (const i of entries) {
             const value = await this.getAll([..._selector, i] as any);
-            if (predicate(value))
+            if (predicate(value, [..._selector, i] as Selector<Database>))
                 return value;
         }
 
