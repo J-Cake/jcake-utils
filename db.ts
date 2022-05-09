@@ -6,6 +6,8 @@ import buffer from './buffer';
 import * as iter from './iter';
 import * as iterSync from './iter_sync';
 
+export const fileHandles: fs.FileHandle[] = [];
+
 const p = <T extends any[]>(x: (next: (...x: T) => void) => void): Promise<T> => new Promise(resolve => x((...obj: T) => resolve(obj)));
 const notNull = function (i: any): i is NonNullable<typeof i> {
     if (typeof i == 'string')
@@ -284,6 +286,42 @@ export default class DB<Database> {
         await this.set([...selector, name.toString(36)] as any, value);
     }
 
+    /**
+     * Find a value in the database
+     * @param selector Any selector into the database
+     * @param predicate Confirm or reject a value
+     * @returns the value if it is found, throws error if not found
+     */
+    public async find<selector extends Selector<Database>>(selector: selector, predicate: (i: any) => boolean): Promise<any> {
+        const _selector = [...selector].map(i => (i as string).toString());
+
+        if (!this.file)
+            throw `Database not loaded`;
+
+        if (!Array.isArray(_selector))
+            throw `Invalid selector: ${[..._selector].join('.')}`;
+
+        const path = [..._selector].filter(notNull).join('.');
+
+        if (this.ptable.has(path))
+            return await this.fetchObject(this.ptable.get(path)!);
+
+        // get all paths which are direct children of selector
+        const path_segments = [...selector].filter(notNull).map(i => (i as any).toString());
+        const entries = Array.from(this.ptable.keys()).filter(p => _.isEqual(p.split('.').slice(0, path_segments.length), path_segments)).map(i => i.split('.')[path_segments.length]);
+
+        if (entries.length === 0)
+            throw `Invalid selector: ${[..._selector].join('.')}`;
+
+        for (const i of entries) {
+            const value = await this.getAll([..._selector, i] as any);
+            if (predicate(value))
+                return value;
+        }
+
+        throw `No matching value was found`;
+    }
+
     public async define<selector extends Selector<Database>>(...selectors: selector[]): Promise<void> {
         if (!this.file)
             throw `Database not loaded`;
@@ -329,6 +367,7 @@ export default class DB<Database> {
         await this.refreshHeader();
 
         await this.file!.close();
+        fileHandles.splice(fileHandles.indexOf(this.file), 1);
     }
 
     private async refreshHeader(): Promise<void> {
@@ -508,6 +547,8 @@ export default class DB<Database> {
         const ptableLen = header.readUInt32BE(4);
 
         const { buffer: ptableBuffer } = await file.read({ buffer: Buffer.alloc(ptableLen), position: header.length });
+
+        fileHandles.push(file);
 
         const db = new DB<Database>(await parsePTable(ptableBuffer));
         // @ts-ignore
