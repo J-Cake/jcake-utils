@@ -1,0 +1,38 @@
+{
+    "name": "jcake-utils",
+    "type": "module",
+    "version": "0.0.1",
+    "main": "./build/index.js",
+    "scripts": {
+        "build:db": "esbuild db.ts --outfile=build/db.js --bundle --sourcemap --platform=node --format=esm",
+        "build:dbrepl": "esbuild repl.ts --outfile=build/dbrepl.js --bundle --sourcemap --platform=node --format=esm",
+        "build:args": "esbuild args.ts --outfile=build/args.js --bundle --sourcemap --platform=node --format=esm",
+        "build:iter": "esbuild iter.ts --outfile=build/iter.js --bundle --sourcemap --platform=node --format=esm",
+        "build:iterSync": "esbuild iter_sync.ts --outfile=build/iterSync.js --bundle --sourcemap --platform=node --format=esm",
+        "build:buffer": "esbuild buffer.ts --outfile=build/buffer.js --bundle --sourcemap --platform=node --format=esm",
+        "build:str": "esbuild strutil.ts --outfile=build/str.js --bundle --sourcemap --platform=node --format=esm",
+        "build:lib": "esbuild index.ts --outfile=build/index.js --bundle --sourcemap --platform=node --format=esm",
+
+        "repl": "node --enable-source-maps=true build/dbrepl.js",
+        "postinstall": "cat package.json | jq -r '.scripts | keys_unsorted[] | select(. | startswith(\"build:\"))' | xargs -d \\\\n -I {} $npm_execpath {}"
+    },
+    "dependencies": {
+        "chalk": "latest",
+        "lodash": "latest"
+    },
+    "devDependencies": {
+        "@types/node": "latest",
+        "@types/lodash": "latest",
+        "typescript": "latest",
+        "esbuild": "latest"
+    },
+    "exports": {
+        "args": "./build/args.js",
+        "buffer": "./build/buffer.js",
+        "db": "./build/db.js",
+        "dbrepl": "./build/dbrepl.js",
+        "iter": "./build/iter.js",
+        "iterSync": "./build/iterSync.js",
+        "str": "./build/string.js"
+    }
+}

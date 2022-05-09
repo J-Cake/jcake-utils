@@ -1,0 +1,4 @@
+/.pnpm-debug.log
+/build
+/node_modules
+/pnpm-lock.yaml
