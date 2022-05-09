@@ -27,12 +27,12 @@
         "esbuild": "latest"
     },
     "exports": {
-        "args": "./build/args.js",
-        "buffer": "./build/buffer.js",
-        "db": "./build/db.js",
-        "dbrepl": "./build/dbrepl.js",
-        "iter": "./build/iter.js",
-        "iterSync": "./build/iterSync.js",
-        "str": "./build/string.js"
+        "./args": "./build/args.js",
+        "./buffer": "./build/buffer.js",
+        "./db": "./build/db.js",
+        "./dbrepl": "./build/dbrepl.js",
+        "./iter": "./build/iter.js",
+        "./iterSync": "./build/iterSync.js",
+        "./str": "./build/string.js"
     }
 }
