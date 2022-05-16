@@ -65,6 +65,11 @@ export async function* flat<T>(...iter: (AsyncIterable<T> | Iterable<T>)[]): Asy
                 yield j as any;
 }
 
+export async function *from<T>(iter: AsyncIterable<T> | Iterable<T>): AsyncGenerator<T> {
+    for await (const i of iter)
+        yield i;
+}
+
 type Flat<T> = T extends AsyncIterable<infer K> ? K : T extends Iterable<infer K> ? K : T;
 
 interface Iter<T> extends AsyncIterable<T> {
@@ -75,14 +80,16 @@ interface Iter<T> extends AsyncIterable<T> {
     collect(): Promise<T[]>;
 }
 
-export default function Iter<T>(iter: AsyncIterable<T>): Iter<T> {
+export default function Iter<T>(iter: AsyncIterable<T> | Iterable<T>): Iter<T> {
+    const _iter: AsyncIterable<T> = from(iter);
+    
     return {
-        [Symbol.asyncIterator]: () => iter[Symbol.asyncIterator](),
+        [Symbol.asyncIterator]: () => _iter[Symbol.asyncIterator](),
 
-        map: <R>(predicate: (i: T, a: number) => R): Iter<R> => Iter(map(iter, predicate)),
-        filter: (predicate: (i: T, a: number) => boolean): Iter<T> => Iter(filter(iter, predicate)),
-        concat: (...iters: (AsyncIterable<T> | Iterable<T>)[]): Iter<T> => Iter(concat(iter, ...iters)),
-        flat: (): Iter<Flat<T>> => Iter(flat(iter)),
-        collect: async (): Promise<T[]> => await collect(iter)
+        map: <R>(predicate: (i: T, a: number) => R): Iter<R> => Iter(map(_iter, predicate)),
+        filter: (predicate: (i: T, a: number) => boolean): Iter<T> => Iter(filter(_iter, predicate)),
+        concat: (...iters: (AsyncIterable<T> | Iterable<T>)[]): Iter<T> => Iter(concat(_iter, ...iters)),
+        flat: (): Iter<Flat<T>> => Iter(flat(_iter)),
+        collect: async (): Promise<T[]> => await collect(_iter)
     };
 }
