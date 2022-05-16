@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { parsePTable } from './ptable';
 import buffer from './buffer';
 import * as iter from './iter';
-import * as iterSync from './iter_sync';
+import Iter, * as iterSync from './iter_sync';
 
 export const fileHandles: fs.FileHandle[] = [];
 
@@ -93,6 +93,8 @@ namespace parsers {
     }
 }
 
+export type KeyList = { [k in string]: k | KeyList };
+
 export default class DB<Database> {
     private readonly file?: fs.FileHandle;
     private readonly ptableSize?: number;
@@ -108,7 +110,7 @@ export default class DB<Database> {
         return parsers;
     }
 
-    public has<selector extends Selector<Database>>(selector: selector): boolean {
+    public has<selector extends Selector<Database>>(selector: selector, where?: (i: selector) => any): boolean {
 
         if (!this.file)
             throw `Database not loaded`;
@@ -127,6 +129,41 @@ export default class DB<Database> {
                 return true;
 
         return false;
+    }
+
+    public keys_flat<selector extends Selector<Database>>(selector: selector): string[] {
+        if (!this.file)
+            throw `Database not loaded`;
+
+        if (!Array.isArray(selector))
+            throw `Invalid selector: ${[...selector].map(i => (i as string).toString()).join('.')}`;
+
+        const _sel = [...selector].map(i => (i as string).toString());
+        const path = _sel.filter(notNull).join('.');
+
+        if (this.ptable.has(path))
+            return [path];
+
+        const keys: string[] = [];
+
+        for (const i of this.ptable.keys())
+            if (_.zip(_sel, i.split('.').slice(0, _sel.length)).every(i => i[0] === i[1]))
+                keys.push(i);
+
+        return keys;
+    }
+
+    public keys<selector extends Selector<Database>>(selector: selector): KeyList {
+        const keys = this.keys_flat(selector);
+
+        const obj: KeyList = {};
+        for (const i of Iter(keys).map(i => i.split('.')))
+            if (i.length - (selector as string[]).length > 1)
+                obj[i[(selector as string[]).length]] = this.keys(i.slice(0, (selector as string[]).length + 1) as selector);
+            else
+                obj[i[(selector as string[]).length]] = i[(selector as string[]).length];
+
+        return obj;
     }
 
     public async *get<selector extends Selector<Database>>(selector: selector): AsyncGenerator<Value<Database, selector> | null> {
