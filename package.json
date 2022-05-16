@@ -26,6 +26,9 @@
         "@types/lodash": "latest",
         "typescript": "latest"
     },
+    "bin": {
+        "dbrepl": "build/dbrepl"
+    },
     "exports": {
         "./args": "./build/args.js",
         "./buffer": "./build/buffer.js",
