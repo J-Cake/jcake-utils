@@ -18,13 +18,13 @@
     },
     "dependencies": {
         "chalk": "latest",
-        "lodash": "latest"
+        "lodash": "latest",
+        "esbuild": "latest"
     },
     "devDependencies": {
         "@types/node": "latest",
         "@types/lodash": "latest",
-        "typescript": "latest",
-        "esbuild": "latest"
+        "typescript": "latest"
     },
     "exports": {
         "./args": "./build/args.js",
