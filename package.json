@@ -27,7 +27,7 @@
         "typescript": "latest"
     },
     "bin": {
-        "dbrepl": "build/dbrepl"
+        "dbrepl": "build/dbrepl.js"
     },
     "exports": {
         "./args": "./build/args.js",
