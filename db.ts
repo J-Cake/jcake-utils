@@ -18,6 +18,8 @@ const notNull = function (i: any): i is NonNullable<typeof i> {
         return i !== null && i !== undefined;
 }
 
+export const inodeLen = (inode: [start: number, end: number]): number => inode[1] - inode[0];
+
 export type Selector<T, Cache extends Array<PropertyKey> = []> =
     T extends PropertyKey ? Cache : {
         [P in keyof T]: [...Cache, P] | Selector<T[P], [...Cache, P]>
@@ -246,7 +248,7 @@ export default class DB<Database> {
         return obj as Value<Database, selector>;
     }
 
-    public async *getRaw<selector extends Selector<Database>>(selector: selector, maxChunkSize: number = Infinity): AsyncGenerator<Buffer> {
+    public async *getRaw<selector extends Selector<Database>>(selector: selector, options: { maxChunkSize?: number, start?: number, end?: number }): AsyncGenerator<Buffer> {
         const _selector = [...selector].map(i => (i as string).toString());
 
         if (!this.file)
@@ -260,14 +262,24 @@ export default class DB<Database> {
         if (!this.ptable.has(path))
             throw `Invalid Selector: Selector '${path}' references a directory`;
 
-        const inodes = this.ptable.get(path)!;
+        const inodes = _.cloneDeep(this.ptable.get(path)!);
+        let start = options.start ?? 0;
+        while (start > 0) {
+
+            if (inodeLen(inodes[0]) > start) {
+                inodes[0][0] += start;
+                break;
+            } else
+                start -= inodeLen(inodes.shift());
+
+        }
 
         for (const i of inodes) {
             let chunkOffset: number = i[0];
-            
+
             while (chunkOffset < i[1])
                 yield await this.file!.read({
-                    buffer: Buffer.alloc(Math.min(i[1] - i[0], maxChunkSize)),
+                    buffer: Buffer.alloc(Math.min(i[1] - i[0], options.maxChunkSize ?? Infinity)),
                     position: chunkOffset + this.data_offset!,
                 }).then(k => (chunkOffset += k.bytesRead, k.buffer));
         }
