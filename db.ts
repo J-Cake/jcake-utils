@@ -225,7 +225,19 @@ export default class DB<Database> {
     }
 
     public async getAll<selector extends Selector<Database>>(selector: selector): Promise<Value<Database, selector> | null> {
-        // return this.get(selector);
+        const _selector = [...selector].map(i => (i as string).toString());
+
+        if (!this.file)
+            throw `Database not loaded`;
+
+        if (!Array.isArray(_selector))
+            throw `Invalid selector: ${[..._selector].join('.')}`;
+
+        const path = [..._selector].filter(notNull).join('.');
+
+        if (this.ptable.has(path))
+            return await this.fetchObject(this.ptable.get(path)!);
+
         let obj: any = {};
 
         for await (const i of this.get(selector))
