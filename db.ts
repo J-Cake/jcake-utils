@@ -246,6 +246,34 @@ export default class DB<Database> {
         return obj as Value<Database, selector>;
     }
 
+    public async *getRaw<selector extends Selector<Database>>(selector: selector, maxChunkSize: number = Infinity): AsyncGenerator<Buffer> {
+        const _selector = [...selector].map(i => (i as string).toString());
+
+        if (!this.file)
+            throw `Database not loaded`;
+
+        if (!Array.isArray(_selector))
+            throw `Invalid selector: ${[..._selector].join('.')}`;
+
+        const path = [..._selector].filter(notNull).join('.');
+
+        if (!this.ptable.has(path))
+            throw `Invalid Selector: Selector '${path}' references a directory`;
+
+        const inodes = this.ptable.get(path)!;
+
+        for (const i of inodes) {
+            let chunkOffset: number = i[0];
+            
+            while (chunkOffset < i[1])
+                yield await this.file!.read({
+                    buffer: Buffer.alloc(Math.min(i[1] - i[0], maxChunkSize)),
+                    position: chunkOffset + this.data_offset!,
+                }).then(k => (chunkOffset += k.bytesRead, k.buffer));
+        }
+
+    }
+
     public async set<selector extends Selector<Database>>(selector: selector, value: Value<Database, selector>): Promise<void> {
         if (!this.file)
             throw `Database not loaded`;
