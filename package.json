@@ -30,6 +30,7 @@
         "dbrepl": "build/dbrepl.js"
     },
     "exports": {
+        ".": "./build/index.js",
         "./args": "./build/args.js",
         "./buffer": "./build/buffer.js",
         "./db": "./build/db.js",
