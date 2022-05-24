@@ -270,7 +270,7 @@ export default class DB<Database> {
                 inodes[0][0] += start;
                 break;
             } else
-                start -= inodeLen(inodes.shift());
+                start -= inodeLen(inodes.shift()!);
 
         }
 

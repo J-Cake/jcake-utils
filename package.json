@@ -3,6 +3,7 @@
     "type": "module",
     "version": "0.0.1",
     "main": "./build/index.js",
+    "typings": "lib",
     "scripts": {
         "build:db": "esbuild src/db.ts --outfile=build/db.js --bundle --sourcemap --platform=node --format=esm",
         "build:dbrepl": "esbuild src/repl.ts --outfile=build/dbrepl.js --bundle --sourcemap --platform=node --format=esm",
@@ -12,7 +13,6 @@
         "build:buffer": "esbuild src/buffer.ts --outfile=build/buffer.js --bundle --sourcemap --platform=node --format=esm",
         "build:str": "esbuild src/strutil.ts --outfile=build/str.js --bundle --sourcemap --platform=node --format=esm",
         "build:lib": "esbuild src/index.ts --outfile=build/index.js --bundle --sourcemap --platform=node --format=esm",
-
         "repl": "node --enable-source-maps=true build/dbrepl.js",
         "postinstall": "cat package.json | jq -r '.scripts | keys_unsorted[] | select(. | startswith(\"build:\"))' | xargs -d \\\\n -I {} $npm_execpath {}"
     },
@@ -29,14 +29,41 @@
     "bin": {
         "dbrepl": "build/dbrepl.js"
     },
+    "typesVersions": {
+        "*": {
+            "exported": [
+                "lib"
+            ]
+        }
+    },
     "exports": {
-        ".": "./build/index.js",
-        "./args": "./build/args.js",
-        "./buffer": "./build/buffer.js",
-        "./db": "./build/db.js",
-        "./dbrepl": "./build/dbrepl.js",
-        "./iter": "./build/iter.js",
-        "./iterSync": "./build/iterSync.js",
-        "./str": "./build/string.js"
+        ".": {
+            "types": "./build/lib/index.d.ts",
+            "default": "./build/index.js"
+        },
+        "./args": {
+            "types": "./lib/args.d.ts",
+            "default": "./build/args.js"
+        },
+        "./buffer": {
+            "types": "./lib/buffer.d.ts",
+            "default": "./build/buffer.js"
+        },
+        "./db": {
+            "types": "./lib/db.d.ts",
+            "default": "./build/db.js"
+        },
+        "./iter": {
+            "types": "./lib/iter.d.ts",
+            "default": "./build/iter.js"
+        },
+        "./iterSync": {
+            "types": "./lib/iterSync.d.ts",
+            "default": "./build/iterSync.js"
+        },
+        "./str": {
+            "types": "./lib/str.d.ts",
+            "default": "./build/string.js"
+        }
     }
 }
