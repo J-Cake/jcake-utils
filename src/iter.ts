@@ -74,6 +74,7 @@ export async function* interleave<T>(...iter: AsyncIterable<T>[]): AsyncGenerato
     const interleave = function <T>(...iter: AsyncIterable<T>[]): AsyncIterable<T> {
         const objBuffer = [];
         let _yield: (value: { value: T, done: boolean }) => void;
+        let done = 0;
 
         const foreach = <T>(iter: AsyncIterator<T>, yieldValue: (value: T, done: boolean) => void) => iter.next().then(val => {
             yieldValue(val.value, val.done);
@@ -84,14 +85,12 @@ export async function* interleave<T>(...iter: AsyncIterable<T>[]): AsyncGenerato
 
         return {
             [Symbol.asyncIterator]() {
-                let done = 0;
                 for (const i of iter)
                     foreach(i[Symbol.asyncIterator](), (value: T, isDone: boolean) => {
-                        if (!isDone) {
-                            _yield({ value, done: done >= iter.length - 1 });
-                            _yield = obj => objBuffer.push(obj); // if we receive an event between the yield and the next iteration, we need to store it in the buffer
-                        } else
+                        if (isDone)
                             done++;
+
+                        _yield({ value, done: done >= iter.length - 1 });
                     });
 
                 return {
@@ -99,8 +98,10 @@ export async function* interleave<T>(...iter: AsyncIterable<T>[]): AsyncGenerato
                         while (objBuffer.length > 0)
                             return Promise.resolve(objBuffer.shift());
 
-                        return new Promise<IteratorResult<T, any>>(next => _yield = next)
-                            .catch(err => (_yield({ value: err, done: true }), err))
+                        return new Promise<IteratorResult<T, any>>(next => _yield = function (value: IteratorResult<T>): void {
+                            _yield = obj => objBuffer.push(obj); // if we receive an event between the yield and the next iteration, we need to store it in the buffer
+                            next(value);
+                        }).catch(err => (_yield({ value: err, done: true }), err))
                     }
                 }
             }
