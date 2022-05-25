@@ -84,12 +84,14 @@ export async function* interleave<T>(...iter: AsyncIterable<T>[]): AsyncGenerato
 
         return {
             [Symbol.asyncIterator]() {
+                let done = 0;
                 for (const i of iter)
-                    foreach(i[Symbol.asyncIterator](), (value: T, done: boolean) => {
-                        if (!done) {
-                            _yield({ value, done: false });
+                    foreach(i[Symbol.asyncIterator](), (value: T, isDone: boolean) => {
+                        if (!isDone) {
+                            _yield({ value, done: done >= iter.length - 1 });
                             _yield = obj => objBuffer.push(obj); // if we receive an event between the yield and the next iteration, we need to store it in the buffer
-                        }
+                        } else
+                            done++;
                     });
 
                 return {
