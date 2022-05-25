@@ -65,9 +65,53 @@ export async function* flat<T>(...iter: (AsyncIterable<T> | Iterable<T>)[]): Asy
                 yield j as any;
 }
 
-export async function *from<T>(iter: AsyncIterable<T> | Iterable<T>): AsyncGenerator<T> {
+export async function* from<T>(iter: AsyncIterable<T> | Iterable<T>): AsyncGenerator<T> {
     for await (const i of iter)
         yield i;
+}
+
+export async function* interleave<T>(...iter: AsyncIterable<T>[]): AsyncGenerator<T> {
+    const interleave = function <T>(...iter: AsyncIterable<T>[]): AsyncIterable<T> {
+        const objBuffer = [];
+        let _yield: (value: { value: T, done: boolean }) => void;
+
+        const foreach = <T>(iter: AsyncIterator<T>, yieldValue: (value: T, done: boolean) => void) => iter.next().then(val => {
+            yieldValue(val.value, val.done);
+
+            if (!val.done)
+                foreach(iter, yieldValue);
+        }).catch(err => yieldValue(err, true));
+
+        return {
+            [Symbol.asyncIterator]() {
+                for (const i of iter)
+                    foreach(i[Symbol.asyncIterator](), (value: T, done: boolean) => {
+                        if (!done) {
+                            _yield({ value, done: false });
+                            _yield = obj => objBuffer.push(obj); // if we receive an event between the yield and the next iteration, we need to store it in the buffer
+                        }
+                    });
+
+                return {
+                    next(...args: any[] | [undefined]): Promise<IteratorResult<T, any>> {
+                        while (objBuffer.length > 0)
+                            return Promise.resolve(objBuffer.shift());
+
+                        return new Promise<IteratorResult<T, any>>(next => _yield = next)
+                            .catch(err => (_yield({ value: err, done: true }), err))
+                    }
+                }
+            }
+        }
+    }
+
+    for await (const i of interleave(...iter))
+        yield i;
+}
+
+export async function* awaitIter<T>(iter: AsyncIterable<T>): AsyncGenerator<Awaited<T>> {
+    for await (const i of iter)
+        yield await i;
 }
 
 type Flat<T> = T extends AsyncIterable<infer K> ? K : T extends Iterable<infer K> ? K : T;
@@ -77,12 +121,14 @@ interface Iter<T> extends AsyncIterable<T> {
     filter(predicate: (i: T, a: number) => boolean): Iter<T>;
     concat(...iter: (AsyncIterable<T> | Iterable<T>)[]): Iter<T>;
     flat(): Iter<Flat<T>>;
+    interleave(...iter: AsyncIterable<T>[]): Iter<T>;
+    await(): Iter<Awaited<T>>;
     collect(): Promise<T[]>;
 }
 
 export default function Iter<T>(iter: AsyncIterable<T> | Iterable<T>): Iter<T> {
     const _iter: AsyncIterable<T> = from(iter);
-    
+
     return {
         [Symbol.asyncIterator]: () => _iter[Symbol.asyncIterator](),
 
@@ -90,6 +136,8 @@ export default function Iter<T>(iter: AsyncIterable<T> | Iterable<T>): Iter<T> {
         filter: (predicate: (i: T, a: number) => boolean): Iter<T> => Iter(filter(_iter, predicate)),
         concat: (...iters: (AsyncIterable<T> | Iterable<T>)[]): Iter<T> => Iter(concat(_iter, ...iters)),
         flat: (): Iter<Flat<T>> => Iter(flat(_iter)),
-        collect: async (): Promise<T[]> => await collect(_iter)
+        interleave: (...iters: AsyncIterable<T>[]): Iter<T> => Iter(interleave(_iter, ...iters)),
+        await: (): Iter<Awaited<T>> => Iter(awaitIter(_iter)),
+        collect: async (): Promise<T[]> => await collect(_iter),
     };
 }

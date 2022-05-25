@@ -107,6 +107,12 @@ Iterators are a very useful tool for handling potentially large sets of data wit
 
 They provide functionality to `map`, `filter`, `filtermap`, `reduce`, `concat` and `collect`, and can be passed to a `for` at each point, without needing to be `collect`ed.
 
+#### AsyncIterators
+
+AsyncIterators expose additional functionality which is nonsensical for synchronous iterators. They are
+* `interleave` - Take a list of asyncIterators and interleave their results.
+* `await` - Flatten nested `Promise`s in an asyncIterator, allowing you to use `async` functions in the `map` for instance.
+
 ### buffer
 
 NodeJS Buffers provide windows into a region of contiguous memory. They are useful for manipulating raw bytes directly. However lack functionality for prepopulating them with data. The `buffer` module provides a number of functions for instantiating buffers. 
