@@ -18,13 +18,15 @@
     },
     "dependencies": {
         "chalk": "latest",
-        "lodash": "latest",
-        "esbuild": "latest"
+        "lodash": "latest"
     },
     "devDependencies": {
         "@types/node": "latest",
         "@types/lodash": "latest",
         "typescript": "latest"
+    },
+    "peerDependencies": {
+        "esbuild": "latest"
     },
     "bin": {
         "dbrepl": "build/dbrepl.js"
