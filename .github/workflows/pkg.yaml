@@ -1,8 +1,7 @@
-name: JCake-Utils
-
+name: Publish package to GitHub Packages
 on:
   push:
-
+  
 jobs:
   build:
     runs-on: ubuntu-latest 
@@ -17,14 +16,8 @@ jobs:
           node-version: '16.x'
           registry-url: 'https://npm.pkg.github.com'
           # Defaults to the user or organization that owns the workflow file
-      - run: mkdir -p build
-      - run: |
-          echo '//registry.npmjs.org/:_authToken=${{ secrets.GITHUB_TOKEN }}
-          @J-Cake:registry=https://npm.pkg.github.com
-          always-auth=true' > ${{ github.workspace }}/build/.npmrc
-      - run: cat build/.npmrc
-      - run: npm install
-      - run: npm run build
-      - run: cd build && npm publish
+          scope: '@octocat'
+      - run: npm ci
+      - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
