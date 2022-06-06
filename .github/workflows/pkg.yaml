@@ -19,8 +19,8 @@ jobs:
       - run: npm run build
       - run: |
           echo "
-            //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
-            @octocat:registry=https://npm.pkg.github.com
+            //npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}
+            @J-Cake:registry=https://npm.pkg.github.com
             always-auth=true" > $HOME/.npmrc; cat ~/.npmrc
             
         env:
