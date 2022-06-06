@@ -1,5 +1,5 @@
 {
-    "name": "jcake-utils",
+    "name": "@J-Cake/jcake-utils",
     "type": "module",
     "version": "0.0.2",
     "main": "./build/index.js",
@@ -65,5 +65,8 @@
             "types": "./lib/str.d.ts",
             "default": "./build/string.js"
         }
+    },
+    "publishConfig": {
+        "@J-Cake:registry": "https://npm.pkg.github.com"
     }
 }
