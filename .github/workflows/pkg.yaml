@@ -17,7 +17,11 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
       - run: npm install
       - run: npm run build
-      - run: echo $HOME
-      - run: find ~ -iname .npmrc
+      - run: |
+          echo "
+            //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+            @octocat:registry=https://npm.pkg.github.com
+            always-auth=true" > $HOME/.npmrc; cat ~/.npmrc
+            
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
