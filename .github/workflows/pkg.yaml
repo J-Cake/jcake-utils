@@ -16,6 +16,7 @@ jobs:
         with:
           node-version: 18
           registry-url: https://npm.pkg.github.com
+      - run: cat ~/.npmrc
       - run: npm install
       - run: npm run build
       - run: cd build; npm publish
