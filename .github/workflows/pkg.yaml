@@ -23,6 +23,6 @@ jobs:
           cat .npmrc
       - run: npm install
       - run: npm run build
-      - run: cd buil && npm publish
+      - run: cd build && npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
