@@ -19,7 +19,7 @@ jobs:
           # Defaults to the user or organization that owns the workflow file
       - run: mkdir -p build
       - run: echo '//registry.npmjs.org/:_authToken=${{ secrets.GITHUB_TOKEN }}\n@J-Cake/registry=https://npm.pkg.github.com\nalways-auth=true' > ${{ github.workspace }}/build/.npmrc
-      - run: cat .npmrc
+      - run: cat build/.npmrc
       - run: npm install
       - run: npm run build
       - run: cd build && npm publish
