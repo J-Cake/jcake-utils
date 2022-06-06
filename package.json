@@ -1,7 +1,7 @@
 {
     "name": "@J-Cake/jcake-utils",
     "type": "module",
-    "version": "0.0.2",
+    "version": "v1.0.0",
     "main": "./build/index.js",
     "typings": "lib",
     "scripts": {
