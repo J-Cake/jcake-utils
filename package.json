@@ -1,5 +1,7 @@
 {
     "name": "@J-Cake/jcake-utils",
+    "displayName": "J-Cake Utils",
+    "pkgName": "jcake-utils",
     "type": "module",
     "version": "v1.0.0",
     "main": "./build/index.js",
@@ -13,6 +15,7 @@
         "build:buffer": "esbuild src/buffer.ts --outfile=build/buffer.js --bundle --sourcemap --platform=node --format=esm",
         "build:str": "esbuild src/strutil.ts --outfile=build/str.js --bundle --sourcemap --platform=node --format=esm",
         "build:lib": "esbuild src/index.ts --outfile=build/index.js --bundle --sourcemap --platform=node --format=esm",
+        "build:_ln": "jq -r '{name: .pkgName} + {version, type, exports: .exports | map_values({types, default: .deploy})}' package.json > build/package.json",
         "repl": "node --enable-source-maps=true build/dbrepl.js",
         "build": "cat package.json | jq -r '.scripts | keys_unsorted[] | select(. | startswith(\"build:\"))' | xargs -d \\\\n -I {} $npm_execpath run {}"
     },
@@ -32,38 +35,48 @@
     "typesVersions": {
         "*": {
             "exported": [
-                "lib"
+                "lib",
+                "def",
+                "build/lib",
+                "build/def"
             ]
         }
     },
     "exports": {
         ".": {
             "types": "./build/lib/index.d.ts",
-            "default": "./build/index.js"
+            "default": "./build/index.js",
+            "deploy": "./index.js"
         },
         "./args": {
             "types": "./lib/args.d.ts",
-            "default": "./build/args.js"
+            "default": "./build/args.js",
+            "deploy": "./args.js"
         },
         "./buffer": {
             "types": "./lib/buffer.d.ts",
-            "default": "./build/buffer.js"
+            "default": "./build/buffer.js",
+            "deploy": "./buffer.js"
         },
         "./db": {
             "types": "./lib/db.d.ts",
-            "default": "./build/db.js"
+            "default": "./build/db.js",
+            "deploy": "./db.js"
         },
         "./iter": {
             "types": "./lib/iter.d.ts",
-            "default": "./build/iter.js"
+            "default": "./build/iter.js",
+            "deploy": "./iter.js"
         },
         "./iterSync": {
             "types": "./lib/iterSync.d.ts",
-            "default": "./build/iterSync.js"
+            "default": "./build/iterSync.js",
+            "deploy": "./iterSync.js"
         },
         "./str": {
             "types": "./lib/str.d.ts",
-            "default": "./build/string.js"
+            "default": "./build/string.js",
+            "deploy": "./string.js"
         }
     },
     "publishConfig": {
