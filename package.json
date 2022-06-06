@@ -14,7 +14,7 @@
         "build:str": "esbuild src/strutil.ts --outfile=build/str.js --bundle --sourcemap --platform=node --format=esm",
         "build:lib": "esbuild src/index.ts --outfile=build/index.js --bundle --sourcemap --platform=node --format=esm",
         "repl": "node --enable-source-maps=true build/dbrepl.js",
-        "postinstall": "cat package.json | jq -r '.scripts | keys_unsorted[] | select(. | startswith(\"build:\"))' | xargs -d \\\\n -I {} $npm_execpath {}"
+        "postinstall": "cat package.json | jq -r '.scripts | keys_unsorted[] | select(. | startswith(\"build:\"))' | xargs -d \\\\n -I {} $npm_execpath run {}"
     },
     "dependencies": {
         "chalk": "latest",
