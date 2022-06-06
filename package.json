@@ -23,9 +23,7 @@
     "devDependencies": {
         "@types/node": "latest",
         "@types/lodash": "latest",
-        "typescript": "latest"
-    },
-    "peerDependencies": {
+        "typescript": "latest",
         "esbuild": "latest"
     },
     "bin": {
