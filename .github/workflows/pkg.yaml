@@ -20,7 +20,7 @@ jobs:
       - run: echo '//registry.npmjs.org/:_authToken=${{ secrets.GITHUB_TOKEN }}\n@J-Cake/registry=https://npm.pkg.github.com\nalways-auth=true' > ${{ github.workspace }}/.npmrc
       - run: cat .npmrc
       - run: npm install
-      - run: npm build
+      - run: npm run build
       - run: cd build && npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
