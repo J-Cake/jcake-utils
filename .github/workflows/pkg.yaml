@@ -17,6 +17,7 @@ jobs:
           node-version: '16.x'
           registry-url: 'https://npm.pkg.github.com'
           # Defaults to the user or organization that owns the workflow file
+      - run: mkdir -p build
       - run: echo '//registry.npmjs.org/:_authToken=${{ secrets.GITHUB_TOKEN }}\n@J-Cake/registry=https://npm.pkg.github.com\nalways-auth=true' > ${{ github.workspace }}/build/.npmrc
       - run: cat .npmrc
       - run: npm install
