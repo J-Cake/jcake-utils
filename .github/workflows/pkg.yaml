@@ -1,6 +1,7 @@
 name: JCake-Utils
 
 on:
+  push:
   release:
     types: [created]
 
@@ -18,11 +19,10 @@ jobs:
           node-version: '16.x'
           registry-url: 'https://npm.pkg.github.com'
           # Defaults to the user or organization that owns the workflow file
-      - run: |
-          echo '//registry.npmjs.org/:_authToken=${{ secrets.GITHUB_TOKEN }}\n@J-Cake/registry=https://npm.pkg.github.com\nalways-auth=true' > ${{ github.workspace }}/.npmrc
-          cat .npmrc
+      - run: echo '//registry.npmjs.org/:_authToken=${{ secrets.GITHUB_TOKEN }}\n@J-Cake/registry=https://npm.pkg.github.com\nalways-auth=true' > ${{ github.workspace }}/.npmrc
+      - run: cat .npmrc
       - run: npm install
-      - run: npm build
-      - run: cd buil && npm publish
+      - run: npm run build
+      - run: cd build && npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

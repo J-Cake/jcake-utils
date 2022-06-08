@@ -72,12 +72,12 @@ export async function* from<T>(iter: AsyncIterable<T> | Iterable<T>): AsyncGener
 
 export async function* interleave<T>(...iter: AsyncIterable<T>[]): AsyncGenerator<T> {
     const interleave = function <T>(...iter: AsyncIterable<T>[]): AsyncIterable<T> {
-        const objBuffer = [];
+        const objBuffer: IteratorResult<T>[] = [];
         let _yield: (value: { value: T, done: boolean }) => void;
         let done = 0;
 
         const foreach = <T>(iter: AsyncIterator<T>, yieldValue: (value: T, done: boolean) => void) => iter.next().then(val => {
-            yieldValue(val.value, val.done);
+            yieldValue(val.value, val.done ?? false);
 
             if (!val.done)
                 foreach(iter, yieldValue);
@@ -96,7 +96,7 @@ export async function* interleave<T>(...iter: AsyncIterable<T>[]): AsyncGenerato
                 return {
                     next(...args: any[] | [undefined]): Promise<IteratorResult<T, any>> {
                         while (objBuffer.length > 0)
-                            return Promise.resolve(objBuffer.shift());
+                            return Promise.resolve(objBuffer.shift()!);
 
                         return new Promise<IteratorResult<T, any>>(next => _yield = function (value: IteratorResult<T>): void {
                             _yield = obj => objBuffer.push(obj); // if we receive an event between the yield and the next iteration, we need to store it in the buffer

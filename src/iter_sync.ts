@@ -74,6 +74,21 @@ export function* flat<T>(...iter: Iterable<T>[]): Generator<Flat<T>> {
                 yield j as any;
 }
 
+// TODO: Integrate with Iter
+export function* peekableIterator<T, R>(iterator: Iterable<T>, map: (i: T) => R, filter: (i: R) => boolean): Generator<[current: R, skip: () => R]> {
+    const mapped = function* (iterator: Iterable<T>): Iterable<R> {
+        for (const i of iterator) {
+            const out = map(i);
+            if (filter(out))
+                yield out;
+        }
+    }
+
+    const iter = mapped(iterator)[Symbol.iterator]();
+    for (let i = iter.next(); !i.done; i = iter.next())
+        yield [i.value, () => (i = iter.next()).value];
+}
+
 type Flat<T> = T extends Iterable<infer K> ? K : T;
 
 export function* range(start: number, end: number, step: number = 1): Generator<number> {

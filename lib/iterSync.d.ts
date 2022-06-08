@@ -8,6 +8,7 @@ declare module "jcake-utils/iterSync" {
     export function shift<T>(iter: Iterable<T>): [T | null, Iterable<T>];
     export function collect<T>(iter: Iterable<T>): T[];
     export function flat<T>(...iter: Iterable<T>[]): Generator<Flat<T>>;
+    export function peekableIterator<T, R>(iterator: Iterable<T>, map: (i: T) => R, filter: (i: R) => boolean): Generator<[current: R, skip: () => R]>;
     type Flat<T> = T extends Iterable<infer K> ? K : T;
     export function range(start: number, end: number, step?: number): Generator<number>;
     interface Iter<T> extends Iterable<T> {

@@ -3,7 +3,7 @@
     "displayName": "J-Cake Utils",
     "pkgName": "jcake-utils",
     "type": "module",
-    "version": "v1.0.1",
+    "version": "v1.0.2",
     "main": "./build/index.js",
     "typings": "lib",
     "scripts": {
@@ -78,8 +78,5 @@
             "default": "./build/string.js",
             "deploy": "./string.js"
         }
-    },
-    "publishConfig": {
-        "@J-Cake:registry": "https://npm.pkg.github.com"
     }
 }
