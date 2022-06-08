@@ -1,5 +1,5 @@
 {
-    "name": "@klauss.net/jcake-utils",
+    "name": "@j-cake/jcake-utils",
     "displayName": "J-Cake Utils",
     "pkgName": "jcake-utils",
     "type": "module",
