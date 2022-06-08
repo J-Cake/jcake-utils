@@ -3,7 +3,7 @@
     "displayName": "J-Cake Utils",
     "pkgName": "jcake-utils",
     "type": "module",
-    "version": "v1.0.2",
+    "version": "v1.0.3",
     "main": "./build/index.js",
     "typings": "lib",
     "scripts": {
@@ -21,6 +21,7 @@
         "build": "cat package.json | jq -r '.scripts | keys_unsorted[] | select(. | startswith(\"build:\"))' | xargs -d \\\\n -I {} $npm_execpath run {}"
     },
     "dependencies": {
+        "@j-cake/jcake-utils": "latest",
         "chalk": "latest",
         "lodash": "latest"
     },
