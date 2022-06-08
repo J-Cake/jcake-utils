@@ -15,7 +15,7 @@
         "build:buffer": "esbuild src/buffer.ts --outfile=build/buffer.js --bundle --sourcemap --platform=node --format=esm",
         "build:str": "esbuild src/strutil.ts --outfile=build/str.js --bundle --sourcemap --platform=node --format=esm",
         "build:lib": "esbuild src/index.ts --outfile=build/index.js --bundle --sourcemap --platform=node --format=esm",
-        "build:_ln": "jq -r '{name: .pkgName} + {version, type, typings, exports: .exports | map_values({types, default: .deploy})}' package.json > build/package.json",
+        "build:_ln": "jq -r '{name} + {version, type, typings, exports: .exports | map_values({types, default: .deploy})}' package.json > build/package.json",
         "build:_type": "mkdir -p build/lib ; cp -r lib/* build/lib",
         "repl": "node --enable-source-maps=true build/dbrepl.js",
         "build": "cat package.json | jq -r '.scripts | keys_unsorted[] | select(. | startswith(\"build:\"))' | xargs -d \\\\n -I {} $npm_execpath run {}"
