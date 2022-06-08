@@ -78,5 +78,8 @@
             "default": "./build/string.js",
             "deploy": "./string.js"
         }
+    },
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com"
     }
 }

@@ -15,13 +15,15 @@ jobs:
       # Setup .npmrc file to publish to GitHub Packages
       - uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
+          node-version: '18.x'
           registry-url: 'https://npm.pkg.github.com'
           # Defaults to the user or organization that owns the workflow file
-      - run: echo '//registry.npmjs.org/:_authToken=${{ secrets.GITHUB_TOKEN }}\n@J-Cake/registry=https://npm.pkg.github.com\nalways-auth=true' > ${{ github.workspace }}/.npmrc
-      - run: cat .npmrc
+      - run: |
+          echo @j-cake:https://npm.pkg.github.com/ > build/.npmrc
+          echo '//npm.pkg.github.com/:_authToken=${NPM_TOKEN}' >> build/.npmrc
       - run: npm install
       - run: npm run build
-      - run: cd build && npm publish
+      - run: npm publish
+        working-directory: ./build
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
