@@ -1,6 +1,5 @@
 name: Publish package to GitHub Packages
 on:
-  push:
   release:
     types: [created]
   
@@ -19,10 +18,10 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
           # Defaults to the user or organization that owns the workflow file
       - run: |
-          echo //npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN}} > ~/.npmrc
+          echo //npm.pkg.github.com/:_authToken=${{ secrets.PAT }} > ~/.npmrc
       - run: npm install
       - run: npm run build
       - run: npm publish --registry=https://npm.pkg.github.com
         working-directory: ./build
         env:
-          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.PAT }}
