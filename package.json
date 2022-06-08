@@ -21,7 +21,6 @@
         "build": "cat package.json | jq -r '.scripts | keys_unsorted[] | select(. | startswith(\"build:\"))' | xargs -d \\\\n -I {} $npm_execpath run {}"
     },
     "dependencies": {
-        "@j-cake/jcake-utils": "latest",
         "chalk": "latest",
         "lodash": "latest"
     },
