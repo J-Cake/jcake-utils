@@ -1,10 +1,9 @@
-name: JCake-Utils
-
+name: Publish package to GitHub Packages
 on:
   push:
   release:
     types: [created]
-
+  
 jobs:
   build:
     runs-on: ubuntu-latest 
