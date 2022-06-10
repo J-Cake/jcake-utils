@@ -7,7 +7,7 @@
         "resolveJsonModule": true,
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
-        "rootDir": "src",
+        "rootDirs": ["src", "test"],
         "outDir": "build/ts",
         "declaration": true,
         "declarationDir": "build/def",
