@@ -3,7 +3,7 @@
     "displayName": "J-Cake Utils",
     "pkgName": "jcake-utils",
     "type": "module",
-    "version": "v1.1.0",
+    "version": "v1.1.2",
     "main": "./build/index.js",
     "typings": "lib",
     "scripts": {
