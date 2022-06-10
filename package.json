@@ -3,7 +3,7 @@
     "displayName": "J-Cake Utils",
     "pkgName": "jcake-utils",
     "type": "module",
-    "version": "v1.0.3",
+    "version": "v1.1.0",
     "main": "./build/index.js",
     "typings": "lib",
     "scripts": {
@@ -14,6 +14,8 @@
         "build:iterSync": "esbuild src/iter_sync.ts --outfile=build/iterSync.js --bundle --sourcemap --platform=node --format=esm",
         "build:buffer": "esbuild src/buffer.ts --outfile=build/buffer.js --bundle --sourcemap --platform=node --format=esm",
         "build:str": "esbuild src/strutil.ts --outfile=build/str.js --bundle --sourcemap --platform=node --format=esm",
+        "build:state": "esbuild src/stateMgr.ts --outfile=build/state.js --bundle --sourcemap --platform=node --format=esm",
+        "build:msg": "esbuild src/msgChannel.ts --outfile=build/msg.js --bundle --sourcemap --platform=node --format=esm",
         "build:lib": "esbuild src/index.ts --outfile=build/index.js --bundle --sourcemap --platform=node --format=esm",
         "build:_ln": "jq -r '{name} + {version, type, typings, exports: .exports | map_values({types, default: .deploy})}' package.json > build/package.json",
         "build:_type": "mkdir -p build/lib ; cp -r lib/* build/lib",
@@ -78,6 +80,16 @@
             "types": "./lib/str.d.ts",
             "default": "./build/string.js",
             "deploy": "./string.js"
+        },
+        "./state": {
+            "types": "./lib/state.d.ts",
+            "default": "./build/state.js",
+            "deploy": "./state.js"
+        },
+        "./msg": {
+            "types": "./lib/msg.d.ts",
+            "default": "./build/msg.js",
+            "deploy": "./msg.js"
         }
     },
     "publishConfig": {
