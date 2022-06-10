@@ -20,11 +20,12 @@ jobs:
       - run: |
           echo //npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }} > $NPM_CONFIG_USERCONFIG;
           cat $NPM_CONFIG_USERCONFIG
-      - run: npm install
-      - run: npm --prefix test install
-      - run: npm run build
-      - run: npm run test
-      - run: npm publish --registry=https://npm.pkg.github.com
+      - run: npm install -g pnpm
+      - run: pnpm install
+      - run: pnpm --prefix test install
+      - run: pnpm run build
+      - run: pnpm run test
+      - run: pnpm publish --registry=https://npm.pkg.github.com
         working-directory: ./build
         env:
           NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
