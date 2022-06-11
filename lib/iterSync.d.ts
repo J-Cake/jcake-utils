@@ -1,4 +1,4 @@
-declare module "jcake-utils/iterSync" {
+declare module "@j-cake/jcake-utils/iterSync" {
     type MaybeFalsy<T> = T | false | null | undefined;
     export function map<T, R>(iter: Iterable<T>, map: (i: T, a: number) => R): Generator<R>;
     export function filter<T>(iter: Iterable<T>, filter: (i: T, a: number) => boolean): Generator<T>;

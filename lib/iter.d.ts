@@ -1,4 +1,4 @@
-declare module "jcake-utils/iter" {
+declare module "@j-cake/jcake-utils/iter" {
     export function map<T, R>(iter: AsyncIterable<T>, map: (i: T, a: number) => R): AsyncGenerator<R>;
     export function filter<T>(iter: AsyncIterable<T>, filter: (i: T, a: number) => boolean): AsyncGenerator<T>;
     export function concat<T>(...iter: (AsyncIterable<T> | Iterable<T>)[]): AsyncGenerator<T>;

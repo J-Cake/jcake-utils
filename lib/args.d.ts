@@ -1,4 +1,4 @@
-declare module "jcake-utils/args" {
+declare module "@j-cake/jcake-utils/args" {
     /// <reference types="node" />
     import url from 'node:url'; type Option<Parser extends (arg: string) => any> = ({
         long?: string;

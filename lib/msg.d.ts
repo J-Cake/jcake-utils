@@ -1,4 +1,4 @@
-declare module "jcake-utils/msg" {
+declare module "@j-cake/jcake-utils/msg" {
     export interface state {
         functionId: number;
         functions: {

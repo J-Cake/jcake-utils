@@ -1,4 +1,4 @@
-declare module "jcake-utils/str" {
+declare module "@j-cake/jcake-utils/str" {
     export function splitTop(token: string, delimiter: string): string[];
     export function hasTop(str: string, has: string): boolean;
     export const trim: (str: string) => string;

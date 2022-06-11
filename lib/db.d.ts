@@ -1,4 +1,4 @@
-declare module "jcake-utils/db" {
+declare module "@j-cake/jcake-utils/db" {
     /// <reference types="node" />
     import { promises as fs } from 'node:fs';
     export const fileHandles: fs.FileHandle[];

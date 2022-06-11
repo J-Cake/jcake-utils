@@ -1,4 +1,4 @@
-declare module "jcake-utils/buffer" {
+declare module "@j-cake/jcake-utils/buffer" {
     /// <reference types="node" />
     export default function buffer(bytes?: number[]): {
         u8(...num: number[]): any;

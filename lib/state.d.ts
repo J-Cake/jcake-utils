@@ -1,4 +1,4 @@
-declare module "jcake-utils/state" {
+declare module "@j-cake/jcake-utils/state" {
     export default class StateManager<State extends {}> {
         private readonly globState;
         private readonly watchers;
