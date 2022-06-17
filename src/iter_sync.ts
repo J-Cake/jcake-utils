@@ -74,19 +74,10 @@ export function* flat<T>(...iter: Iterable<T>[]): Generator<Flat<T>> {
                 yield j as any;
 }
 
-// TODO: Integrate with Iter
-export function* peekableIterator<T, R>(iterator: Iterable<T>, map: (i: T) => R, filter: (i: R) => boolean): Generator<[current: R, skip: () => R]> {
-    const mapped = function* (iterator: Iterable<T>): Iterable<R> {
-        for (const i of iterator) {
-            const out = map(i);
-            if (filter(out))
-                yield out;
-        }
-    }
-
-    const iter = mapped(iterator)[Symbol.iterator]();
+export function* peekable<T>(iterator: Iterable<T>): Generator<{ current: T, skip: () => T }> {
+    const iter = iterator[Symbol.iterator]();
     for (let i = iter.next(); !i.done; i = iter.next())
-        yield [i.value, () => (i = iter.next()).value];
+        yield { current: i.value, skip: () => (i = iter.next()).value };
 }
 
 type Flat<T> = T extends Iterable<infer K> ? K : T;
@@ -101,6 +92,7 @@ interface Iter<T> extends Iterable<T> {
     filter(predicate: (i: T, a: number) => boolean): Iter<T>;
     filtermap<R>(predicate: (i: T, a: number) => MaybeFalsy<R>): Iter<R>;
     concat(...iter: Iterable<T>[]): Iter<T>;
+    peekable(): Iter<{current: T, skip: () => T}>;
     collect(): T[];
     flat(): Iter<Flat<T>>;
 }
@@ -112,6 +104,7 @@ export default function Iter<T>(iter: Iterable<T>): Iter<T> {
         filter: (predicate: (i: T, a: number) => boolean): Iter<T> => Iter(filter(iter, predicate)),
         filtermap: <R>(predicate: (i: T, a: number) => MaybeFalsy<R>): Iter<R> => Iter(filtermap(iter, predicate)),
         concat: (...iters: Iterable<T>[]): Iter<T> => Iter(concat(iter, ...iters)),
+        peekable: (): Iter<{current: T, skip: () => T}> => Iter(peekable(iter)),
         collect: (): T[] => collect(iter),
         flat: (): Iter<Flat<T>> => Iter(flat(iter))
     }
