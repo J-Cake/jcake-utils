@@ -1,7 +1,12 @@
 {
     "name": "@j-cake/jcake-utils",
-    "displayName": "J-Cake Utils",
-    "pkgName": "jcake-utils",
+    "description": "A collection of utilities for everyday nodejs usage.",
+    "author": {
+        "name": "J-Cake",
+        "email": "jakieschneider13@gmail.com",
+        "url": "https://jschneiderprojects.com.au"
+    },
+    "repository": "https://github.com/J-Cake/jcake-utils",
     "type": "module",
     "version": "v1.1.4",
     "main": "./build/index.js",
@@ -17,13 +22,14 @@
         "build:state": "esbuild src/stateMgr.ts --outfile=build/state.js --bundle --sourcemap --platform=node --format=esm",
         "build:msg": "esbuild src/msgChannel.ts --outfile=build/msg.js --bundle --sourcemap --platform=node --format=esm",
         "build:lib": "esbuild src/index.ts --outfile=build/index.js --bundle --sourcemap --platform=node --format=esm",
-        "build:_ln": "jq -r '{name} + {version, type, typings, exports: .exports | map_values({types, default: .deploy})}' package.json > build/package.json",
+        "build:_pkg": "cat package.json | jq -r '{name, version, type, typings, exports: .exports | map_values({types, default: .deploy})}' > build/package.json",
+        "build:_readme": "ln -f README.md build/README.md",
         "build:_type": "mkdir -p build/lib ; cp -r lib/* build/lib",
-        "build:_test": "$npm_execpath --prefix test run build:all",
+        "build:_test": "$npm_execpath --prefix test install && $npm_execpath --prefix test run build:all",
         "repl": "node --enable-source-maps=true build/dbrepl.js",
         "build": "cat package.json | jq -r '.scripts | keys_unsorted[] | select(. | startswith(\"build:\"))' | xargs -d \\\\n -I {} $npm_execpath run {}",
         "test": "cat test/package.json | jq -r '.tests[]' | xargs -d \\\\n -I {} bash -c 'cd ./build/test && node {}'",
-        "clean": "rm -rf build node_modules package-lock.json yarn.lock .yarn-cache pnpm-lock.yaml .pnpm* test/node_modules test/pnpm* test/.pnpm* test/package-lock.json test/.yarn-cache"
+        "clean": "rm -rf build node_modules *lock* .yarn-cache .pnpm* test/node_modules test/pnpm* test/.pnpm* test/*lock* test/.yarn-cache"
     },
     "dependencies": {
         "chalk": "latest",

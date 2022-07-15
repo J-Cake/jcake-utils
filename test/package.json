@@ -5,6 +5,6 @@
         "build:all": "find $(cd .. ; pwd) -iname \\*.test.ts | xargs -d \\\\n -I {} pnpm --prefix ../ exec esbuild {} --outdir=build/test --bundle --platform=node --format=esm"
     },
     "dependencies": {
-        "jcake-utils": "link:.."
+        "@j-cake/jcake-utils": "link:../build"
     }
 }

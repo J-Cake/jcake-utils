@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import chalk from 'chalk';
-import StateMgr from 'jcake-utils/state';
+import StateMgr from '@j-cake/jcake-utils/state';
 
 assert.equal(typeof StateMgr, 'function');
 assert.equal(typeof StateMgr.prototype.constructor, 'function');
