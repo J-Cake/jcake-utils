@@ -19,15 +19,13 @@ jobs:
           node-version: '16.x'
           registry-url: 'https://npm.pkg.github.com'
           # Defaults to the user or organization that owns the workflow file
-      - run: |
-          echo //npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }} > $NPM_CONFIG_USERCONFIG;
-          cat $NPM_CONFIG_USERCONFIG
-      - run: npm install -g pnpm
-      - run: pnpm install
-      - run: pnpm --prefix test install
-      - run: pnpm run build
-      - run: pnpm run test
-      - run: pnpm publish --registry=https://npm.pkg.github.com
+      - run: npm config set registry https://npm.pkg.github.com && npm set //npm.pkg.github.com/:_authToken ${{ secrets.GH_PKG }}
+      - run: npm config set registry https://registry.npmjs.com && npm set //registry.npmjs.com/:_authToken ${{ secrets.NPM_PKG }}
+      - run: npm install
+      - run: npm run build
+      - run: npm publish --access public --registry https://registry.npmjs.com
         working-directory: ./build
-        env:
-          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: npm publish --access public --registry https://npm.pkg.com
+        working-directory: ./build
+        # env:
+        #   NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
