@@ -21,6 +21,7 @@
         "build:str": "esbuild src/strutil.ts --outfile=build/str.js --bundle --sourcemap --platform=node --format=esm",
         "build:state": "esbuild src/stateMgr.ts --outfile=build/state.js --bundle --sourcemap --platform=node --format=esm",
         "build:msg": "esbuild src/msgChannel.ts --outfile=build/msg.js --bundle --sourcemap --platform=node --format=esm",
+        "build:parse": "esbuild src/parse.ts --outfile=build/parse.js --bundle --sourcemap --platform=node --format=esm",
         "build:lib": "esbuild src/index.ts --outfile=build/index.js --bundle --sourcemap --platform=node --format=esm",
         "build:_pkg": "cat package.json | jq -r '{name, version, type, typings, exports: .exports | map_values({types, default: .deploy})}' > build/package.json",
         "build:_readme": "ln -f README.md build/README.md",
@@ -99,6 +100,11 @@
             "types": "./lib/msg.d.ts",
             "default": "./build/msg.js",
             "deploy": "./msg.js"
+        },
+        "./parse": {
+            "types": "./lib/parse.d.ts",
+            "default": "./build/parse.js",
+            "deploy": "./parse.js"
         }
     },
     "publishConfig": {

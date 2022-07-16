@@ -1,6 +1,6 @@
 {
     "name": "test",
-    "tests": ["stateMgr.test.js", "msgChannel.test.js"],
+    "tests": ["stateMgr.test.js", "msgChannel.test.js", "lex.test.js"],
     "scripts": {
         "build:all": "find $(cd .. ; pwd) -iname \\*.test.ts | xargs -d \\\\n -I {} pnpm --prefix ../ exec esbuild {} --outdir=build/test --bundle --platform=node --format=esm"
     },
