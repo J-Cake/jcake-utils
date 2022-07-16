@@ -1,3 +1,5 @@
+import assert from 'node:assert';
+import chalk from 'chalk';
 import {Lex} from '@j-cake/jcake-utils/parse';
 import * as iter from '@j-cake/jcake-utils/iter'
 
@@ -13,4 +15,7 @@ const tokens = await iter.collect(lexer(iter.from([
     'As do I'
 ])));
 
-console.log(tokens);
+assert.equal(tokens.length, 3);
+// check token types
+
+console.log(chalk.green('[Info]'), 'Lex test passed');

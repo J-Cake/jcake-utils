@@ -9,13 +9,13 @@ export interface Token<T extends string = string, Tok extends string = string> {
     charIndex: number,
     line: number,
     char: number,
-    origin?: strings
+    origin?: string
 }
 
 export type StringStream = AsyncIterator<any & { toString(): string }>;
 export type Lexer<T extends string> = (input: StringStream) => AsyncIterator<Token<T>>
 
-export function createLexer<T extends string>(matchers: Record<T, (tok: string) => Nullable<string>>): Lexer<T> {
+export function createLexer<T extends string>(matchers: Record<T, (tok: string) => Nullable<string>>, origin?: string): Lexer<T> {
 
     return async function*(input: StringStream): AsyncGenerator<Token<T>> {
         let tokenBuffer: Nullable<string> = '';
@@ -58,7 +58,8 @@ export function createLexer<T extends string>(matchers: Record<T, (tok: string) 
                         src: longest[1],
                         charIndex,
                         char: 0,
-                        line: 0
+                        line: 0,
+                        origin
                     };
 
                     tokenBuffer = tokenBuffer.slice(longest[1].length);
