@@ -27,6 +27,6 @@ declare module "@j-cake/jcake-utils/msg" {
         };
     }
     export type channelFn = <T>(name: string, data: any) => Promise<T>;
-    export default function (stateManager: import('jcake-utils/state').default<state>): channelFn;    
+    export default function (stateManager: import('@j-cake/jcake-utils/state').default<state>): channelFn;
 
 }
