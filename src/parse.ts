@@ -27,19 +27,24 @@ export interface ParserBuilder<T extends string, K extends string> {
 export function createParser<T extends string, K extends string>(name: K): ParserBuilder<T, K> {
     return {
         exactly(...matchers): ParserBuilder<T, K> {
-            return undefined as any;
+            return createParser(name);
+            // return undefined as any;
         },
         maybe(...matchers): ParserBuilder<T, K> {
-            return undefined as any;
+            return createParser(name);
+            // return undefined as any;
         },
         oneOf(...matchers): ParserBuilder<T, K> {
-            return undefined as any;
+            return createParser(name);
+            // return undefined as any;
         },
         repeat(...matchers): ParserBuilder<T, K> {
-            return undefined as any;
+            return createParser(name);
+            // return undefined as any;
         },
 
         async exec(tokens: AsyncIterable<Token<T>>): Promise<ASTNode<T, K>> {
+            // return createParser(name);
             return undefined as any;
         }
     }

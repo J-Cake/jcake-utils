@@ -1,5 +1,6 @@
 import Iter from '@j-cake/jcake-utils/iter';
-import { Lex, createParser } from '@j-cake/jcake-utils/parse';
+import { Lex, createParser, ParserBuilder } from '@j-cake/jcake-utils/parse';
+import chalk from "chalk";
 
 const lex = Lex.createLexer({
     open: tok => ['(', '[', '{'].find(i => tok.startsWith(i)),
@@ -19,26 +20,33 @@ const tokens = await Iter(lex([`fn main(argv, argc) {
     .filter(i => i.type !== 'whitespace' || i.src.includes(';'))
     .collect();
 
-var Value = createParser('Value')
+type T = typeof tokens[number]['type'];
+type K = 'Value' | 'Literal' | 'ParenthesisedExpression' | 'Expression' | 'Statement' | 'Return' | 'Fn' | 'ArgList';
+
+// noinspection JSDuplicatedDeclaration
+var Expression: ParserBuilder<T, K> = null as any;
+var Value = createParser<T, K>('Value')
     .oneOf(
-        createParser('Literal').oneOf({type: 'int'}/* other literals */),
-        createParser('ParenthesisedExpression').exactly({type; 'open', src: '('}, Expression, {type: 'close', src: ')'})
+        createParser<T, K>('Literal').oneOf({type: 'int'}/* other literals */),
+        createParser<T, K>('ParenthesisedExpression').exactly({type: 'open', src: '('}, Expression, {type: 'close', src: ')'})
     )
 
-var Expression = createParser('Expression')
+// noinspection JSDuplicatedDeclaration
+var Expression = createParser<T, K>('Expression')
     .maybe(Value)
     .repeat({type: 'operator'}, Value);
 
-var Statement = createParser('Statement')
+var Statement = createParser<T, K>('Statement')
     .oneOf(
-        createParser('Return').exactly({type: 'keyword', src: 'ret'}, Expression),
+        createParser<T, K>('Return').exactly({type: 'keyword', src: 'ret'}, Expression),
         /* other types of statements */
     )
 
-var Fn = createParser('Fn')
+var Fn = createParser<T, K>('Fn')
     .exactly({type: 'keyword', src: 'fn'}, {type: 'open', src: '('})
-    .maybe(createParser('ArgList').repeat({type: 'name'}))
+    .maybe(createParser<T, K>('ArgList').repeat({type: 'name'}))
     .exactly({type: 'close', src: ')'}, {type: 'open', src: '{'})
     .repeat(Statement)
     .exactly({type: 'close', src: '}'})
 
+console.log(chalk.green('[Info]'), 'Parse test passed');
