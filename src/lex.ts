@@ -32,12 +32,20 @@ export type Lexer<T extends string> = (input: StringStream) => AsyncIterator<Tok
 
 export function createLexer<T extends string>(matchers: Record<T, (tok: string) => Nullable<string>>, origin?: string): Lexer<T> {
 
-    return async function*(input: StringStream): AsyncGenerator<Token<T>> {
+    return async function*(input: StringStream | string): AsyncGenerator<Token<T>> {
         let tokenBuffer: string = '';
         let charIndex: number = 0;
 
-        for await (const token of Iter(input).map(i => i.toString()).filter(i => i.length > 0).concat(iter.from(['']))) {
-            tokenBuffer += token;
+        const toIter = function (stream: StringStream | string): AsyncIterable<any & { toString(): string }> {
+            if (typeof stream == 'object' && stream[Symbol.asyncIterator])
+                return stream;
+            else if (typeof stream == 'object')
+                return iter.from(stream);
+            else return iter.from([stream]);
+        }
+
+        for await (const chunk of Iter(toIter(input)).map(i => i.toString()).filter(i => i.length > 0).concat(iter.from(['']))) {
+            tokenBuffer += chunk;
 
             while (tokenBuffer.length > 0) {
                 let longest: Nullable<[T, string]>;
@@ -53,7 +61,7 @@ export function createLexer<T extends string>(matchers: Record<T, (tok: string) 
                 if (!longest || longest[1].length <= 0)
                     throw `SyntaxError: Unexpected token ${tokenBuffer.split(/\s/).shift() ?? ''}`;
 
-                if (longest[1].length < tokenBuffer.length || !token) {
+                if (longest[1].length < tokenBuffer.length || !chunk) {
                     yield {
                         type: longest[0],
                         src: longest[1],

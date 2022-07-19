@@ -27,6 +27,9 @@ declare module "@j-cake/jcake-utils/parse" {
         src?: string
     };
 
+    export type ResumableStream<T> = () => Promise<Lex.Nullable<T>>;
+    export function resumableStream<T>(iter: AsyncIterable<T>): ResumableStream<T>;
+
     export interface ParserBuilder<T extends string, K extends string> {
         exactly(...parser: Array<TokenMatcher<T> | ParserBuilder<T, K>>): ParserBuilder<T, K>,
 
@@ -36,7 +39,7 @@ declare module "@j-cake/jcake-utils/parse" {
 
         maybe(...parser: Array<TokenMatcher<T> | ParserBuilder<T, K>>): ParserBuilder<T, K>,
 
-        exec(tokens: AsyncIterable<Lex.Token<T>>): Promise<ASTNode<T, K>>
+        exec(nextToken: AsyncIterable<Lex.Token<T>>): Promise<ASTNode<T, K>>
     }
 
     export function createParser<T extends string, K extends string>(name: K): ParserBuilder<T, K>;
