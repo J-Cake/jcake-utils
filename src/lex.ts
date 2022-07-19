@@ -2,15 +2,15 @@ import * as iterSync from './iter_sync';
 import Iter, * as iter from './iter';
 
 /* Streaming lexer:
-             * Streaming tokens is tricky because a lexer needs to be able handle cases where the token is valid, but other matches exist, but require looking further ahead.
-             * For instance, take integers:
-             *   the number 1234 could be matched as 1, 2, 3, 4 as separate tokens.
-             * To overcome this, the lexer takes the longest matching string and assumes it is the most optimal match.
-             * When streaming is introduced, the issue of being able to see theoretically to the end of the string stream becomes non-certain.
-             * Thus, for the lexer to be able to correctly tokenise such cases, we must assume that there exists a match which requires pieces of the following chunk.
-             * It is entirely possible for a token match to span multiple chunks, but is increasingly unlikely.
-             * Hence, it is assumed that no match includes the very end of the buffered region, the token is assumed to be valid.
-             */
+ * Streaming tokens is tricky because a lexer needs to be able handle cases where the token is valid, but other matches exist, but require looking further ahead.
+ * For instance, take integers:
+ *   the number 1234 could be matched as 1, 2, 3, 4 as separate tokens.
+ * To overcome this, the lexer takes the longest matching string and assumes it is the most optimal match.
+ * When streaming is introduced, the issue of being able to see theoretically to the end of the string stream becomes non-certain.
+ * Thus, for the lexer to be able to correctly tokenise such cases, we must assume that there exists a match which requires pieces of the following chunk.
+ * It is entirely possible for a token match to span multiple chunks, but is increasingly unlikely.
+ * Hence, it is assumed that no match includes the very end of the buffered region, the token is assumed to be valid.
+ */
 // 1. continue searching for matches until the longest token reaches the end of the currently buffered string.
 // This is done, in case the matched token is valid, but not the longest possible token.
 // 2. run buffered string through matcher list

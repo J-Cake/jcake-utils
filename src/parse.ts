@@ -1,5 +1,5 @@
 import {Nullable, Token} from "./lex";
-import Iter, * as iter from "./iter";
+import Iter from "./iter";
 
 export * as Lex from './lex';
 
@@ -17,6 +17,8 @@ export interface TokenMatcher<T extends string> {
 const parser = Symbol.for('parser');
 
 export interface ParserBuilder<T extends string, K extends string> {
+    [parser]: typeof parser
+
     exactly(...parser: Array<TokenMatcher<T> | ParserBuilder<T, K>>): ParserBuilder<T, K>,
 
     oneOf(...parser: Array<TokenMatcher<T> | ParserBuilder<T, K>>): ParserBuilder<T, K>,
@@ -25,19 +27,17 @@ export interface ParserBuilder<T extends string, K extends string> {
 
     maybe(...parser: Array<TokenMatcher<T> | ParserBuilder<T, K>>): ParserBuilder<T, K>,
 
-    exec(tokens: AsyncIterable<Token<T>>): Promise<Nullable<ASTNode<T, K>>>,
+    exec(tokens: AsyncIterator<Token<T>>): Promise<Nullable<ASTNode<T, K>>>,
 
     parse(tokens: Token<T>[]): any,
-
-    [parser]: typeof parser
 }
 
 const isParserBuilder = <T extends string, K extends string>(x: ParserBuilder<T, K> | TokenMatcher<T>): x is ParserBuilder<T, K> => parser in x;
-const take = async function <T extends string, K extends string>(nextToken: ResumableStream<Token<T>>, matcher: ParserBuilder<T, K> | TokenMatcher<T>): Promise<any> {
-    if (isParserBuilder(matcher)) {
-
-    } else {
-        const tok = await nextToken();
+const take = async function <T extends string, K extends string>(stream: AsyncIterator<Token<T>>, matcher: ParserBuilder<T, K> | TokenMatcher<T>): Promise<any> {
+    if (isParserBuilder(matcher))
+        return await matcher.exec(stream);
+    else {
+        const {value: tok} = await stream.next();
 
         if (!tok)
             return null;
@@ -57,12 +57,6 @@ const take = async function <T extends string, K extends string>(nextToken: Resu
     }
 }
 
-export type ResumableStream<T> = () => Promise<Nullable<T>>;
-export function resumableStream<T>(iter: AsyncIterable<T>): ResumableStream<T> {
-    const stream = iter[Symbol.asyncIterator]();
-    return async () => await stream.next().then(res => res.value);
-}
-
 export function createParser<T extends string, K extends string>(name: K): ParserBuilder<T, K> {
     return Object.defineProperty({
         exactly(...matchers): ParserBuilder<T, K> {
@@ -70,9 +64,8 @@ export function createParser<T extends string, K extends string>(name: K): Parse
             return {
                 ...ctx = createParser(name),
                 async exec(tokens) {
-                    const next = resumableStream(tokens);
                     const cmp = await Iter(matchers)
-                        .map(i => take(next, i))
+                        .map(i => take(tokens, i))
                         .await()
                         .collect();
 
@@ -92,10 +85,38 @@ export function createParser<T extends string, K extends string>(name: K): Parse
             return createParser(name);
         },
         oneOf(...matchers): ParserBuilder<T, K> {
-            return createParser(name);
+            let ctx: ParserBuilder<T, K>;
+            return {
+                ...ctx = createParser(name),
+                async exec(tokens) {
+                    const token = await take(tokens, ctx);
+                    for (const i of matchers) {
+                        const res = await take(tokens, i);
+                        if (res)
+                            return ctx.parse([token])
+                    }
+                }
+            }
         },
         repeat(...matchers): ParserBuilder<T, K> {
-            return createParser(name);
+            let ctx: ParserBuilder<T, K>;
+            return {
+                ...ctx = createParser(name),
+                async exec(tokens) {
+                    const matches: any[] = [];
+                    outer: do {
+                        for (const i of matchers)
+                            if (matches.length > 0 && !matches.at(-1))
+                                break outer;
+                            else
+                                matches.push(await take(tokens, i))
+                        if (matches.length <= 0)
+                            return null;
+                    } while (matches.at(-1))
+
+                    return ctx.parse(matches);
+                }
+            };
         },
 
         [parser]: parser, // yes this is a parser

@@ -17,5 +17,3 @@ const tokens = await iter.collect(lexer(iter.from([
 
 assert.equal(tokens.length, 3);
 // check token types
-
-console.log(chalk.green('[Info]'), 'Lex test passed');

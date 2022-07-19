@@ -30,7 +30,8 @@
         "repl": "node --enable-source-maps=true build/dbrepl.js",
         "build": "cat package.json | jq -r '.scripts | keys_unsorted[] | select(. | startswith(\"build:\"))' | xargs -d \\\\n -I {} $npm_execpath run {}",
         "test": "cat test/package.json | jq -r '.tests[]' | xargs -d \\\\n -I {} bash -c 'cd ./build/test && node {}'",
-        "clean": "rm -rf build node_modules *lock* .yarn-cache .pnpm* test/node_modules test/pnpm* test/.pnpm* test/*lock* test/.yarn-cache"
+        "clean": "rm -rf build node_modules *lock* .yarn-cache .pnpm* test/node_modules test/pnpm* test/.pnpm* test/*lock* test/.yarn-cache",
+        "postinstall": "$npm_execpath --prefix test install"
     },
     "dependencies": {
         "chalk": "latest",
@@ -39,6 +40,7 @@
     "devDependencies": {
         "@types/node": "latest",
         "@types/lodash": "latest",
+        "@j-cake/mkjson": "latest",
         "typescript": "latest",
         "esbuild": "latest"
     },
