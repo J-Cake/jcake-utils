@@ -1,6 +1,13 @@
 {
     "name": "test",
-    "tests": ["stateMgr.js", "msgChannel.js", "lex.js", "parse.js"],
+    "tests": [
+        "stateMgr.js",
+        "msgChannel.js",
+        "lex.js",
+        "parse/lex.js",
+        "parse/basic.js",
+        "parse/lang.ts"
+    ],
     "scripts": {
         "build:all": "find $(cd .. ; pwd) -iname \\*.test.ts | xargs -d \\\\n -I {} pnpm --prefix ../ exec esbuild {} --outdir=build/test --bundle --sourcemap --platform=node --format=esm"
     },

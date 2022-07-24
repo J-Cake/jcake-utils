@@ -1,7 +1,10 @@
-/.pnpm-debug.log
-/build
-/node_modules
-/pnpm-lock.yaml
-/test/node_modules
-/test/pnpm*
-/test/package-lock.json
+.pnpm-debug.log
+build
+node_modules
+pnpm-lock.yaml
+test/node_modules
+test/pnpm*
+test/package-lock.json
+*lock*
+*yarn*
+*pnpm*

@@ -1,103 +1,88 @@
 {
     targets: {
-        './build/db.js': {
-            dependencies: [
-                'src/db.ts',
-                'src/ptable.ts'
-            ],
-            run: "pnpm exec esbuild src/db.ts --outfile=build/db.js --bundle --sourcemap --platform=node --format=esm"
+        'build/args.js': {
+            dependencies: ['src/args/*.ts'],
+            run: "pnpm exec esbuild src/args/index.ts --outfile=build/args.js --bundle --sourcemap --platform=node --format=esm"
         },
-        './build/dbrepl.js': {
-            dependencies: [
-                'src/repl.ts'
-            ],
-            run: "pnpm exec esbuild src/repl.ts --outfile=build/dbrepl.js --bundle --sourcemap --platform=node --format=esm"
+        'build/buffer.js': {
+            dependencies: ['src/buffer/*.ts'],
+            run: "pnpm exec esbuild src/buffer/index.ts --outfile=build/buffer.js --bundle --sourcemap --platform=node --format=esm"
         },
-        './build/args.js': {
-            dependencies: [
-                'src/args.ts'
-            ],
-            run: "pnpm exec esbuild src/args.ts --outfile=build/args.js --bundle --sourcemap --platform=node --format=esm"
+        'build/db.js': {
+            dependencies: ['src/db/*.ts', 'build/iter.js', 'build/buffer.js'],
+            run: "pnpm exec esbuild src/db/index.ts --outfile=build/db.js --bundle --sourcemap --platform=node --format=esm"
         },
-        './build/iter.js': {
-            dependencies: [
-                'src/iter.ts'
-            ],
-            run: "pnpm exec esbuild src/iter.ts --outfile=build/iter.js --bundle --sourcemap --platform=node --format=esm"
+        'build/dbrepl.js': {
+            dependencies: ['src/db/*.ts', 'build/db.js', 'build/iter.js', 'build/buffer.js', 'build/parse.js'],
+            run: "pnpm exec esbuild src/db/repl.ts --outfile=build/dbrepl.js --bundle --sourcemap --platform=node --format=esm"
         },
-        './build/iterSync.js': {
-            dependencies: [
-                'src/iter_sync.ts'
-            ],
-            run: "pnpm exec esbuild src/iter_sync.ts --outfile=build/iterSync.js --bundle --sourcemap --platform=node --format=esm"
+        'build/io.js': {
+            dependencies: ['src/io/*.ts'],
+            run: "pnpm exec esbuild src/io/index.ts --outfile=build/io.js --bundle --sourcemap --platform=node --format=esm"
         },
-        './build/buffer.js': {
-            dependencies: [
-                'src/buffer.ts'
-            ],
-            run: "pnpm exec esbuild src/buffer.ts --outfile=build/buffer.js --bundle --sourcemap --platform=node --format=esm"
+        'build/iter.js': {
+            dependencies: ['src/iter/*.ts'],
+            run: "pnpm exec esbuild src/iter/index.ts --outfile=build/iter.js --bundle --sourcemap --platform=node --format=esm"
         },
-        './build/str.js': {
-            dependencies: [
-                'src/strutil.ts'
-            ],
-            run: "pnpm exec esbuild src/strutil.ts --outfile=build/str.js --bundle --sourcemap --platform=node --format=esm"
+        'build/msg.js': {
+            dependencies: ['src/msg/*.ts', 'build/state.js'],
+            run: "pnpm exec esbuild src/msg/index.ts --outfile=build/msg.js --bundle --sourcemap --platform=node --format=esm"
         },
-        './build/state.js': {
-            dependencies: [
-                'src/stateMgr.ts'
-            ],
-            run: "pnpm exec esbuild src/stateMgr.ts --outfile=build/state.js --bundle --sourcemap --platform=node --format=esm"
+        'build/parse.js': {
+            dependencies: ['src/parse/*.ts', 'build/iter.js'],
+            run: "pnpm exec esbuild src/parse/index.ts --outfile=build/parse.js --bundle --sourcemap --platform=node --format=esm"
         },
-        './build/msg.js': {
-            dependencies: [
-                'src/msgChannel.ts'
-            ],
-            run: "pnpm exec esbuild src/msgChannel.ts --outfile=build/msg.js --bundle --sourcemap --platform=node --format=esm"
+        'build/state.js': {
+            dependencies: ['src/state/*.ts'],
+            run: "pnpm exec esbuild src/state/index.ts --outfile=build/state.js --bundle --sourcemap --platform=node --format=esm"
         },
-        './build/parse.js': {
-            dependencies: [
-                'src/parse.ts',
-                'src/lex.ts'
-            ],
-            run: "pnpm exec esbuild src/parse.ts --outfile=build/parse.js --bundle --sourcemap --platform=node --format=esm"
-        },
-        './build/index.js': {
-            dependencies: [
-                'src/index.ts'
-            ],
+        'build/index.js': {
+            dependencies: ['src/index.ts'],
             run: "pnpm exec esbuild src/index.ts --outfile=build/index.js --bundle --sourcemap --platform=node --format=esm"
         },
-        './build/test/(stateMgr).js;./build/test/(msgChannel).js;./build/test/(parse/lex).js;./build/test/(parse/basic).js;./build/test/(parse/lang).js': {
+        'build/test/(import).js;build/test/(stateMgr).js;build/test/(msgChannel).js;build/test/(parse/lex).js;build/test/(parse/basic).js;build/test/(parse/lang).js;build/test/(rewindIter).js': {
             dependencies: [
-                './test/*.test.ts'
+                'test/*.ts'
             ],
-            run: ["pnpm exec esbuild test/src/$target_0.ts --outfile=$PWD/build/test/$target_0.js --bundle --sourcemap --platform=node --format=esm"]
+            run: [
+                "pnpm --prefix test install",
+                "pnpm exec esbuild test/src/$target_0.ts --outfile=$PWD/build/test/$target_0.js --bundle --sourcemap --platform=node --format=esm"
+            ],
+            env: {
+                PWD: 'cd test 2>/dev/null ; echo $PWD' // change dir to test, regardless of whether we're already there
+            }
         },
-        './build/package.json': {
+        'build/package.json': {
             dependencies: [
-                './package.json'
+                'package.json'
             ],
             run: [
                 "mkdir -p build",
-                "cat package.json | jq -r '{name, version, type, typings, exports: .exports | map_values({types, default: .deploy})}' > build/package.json"
+                "jq -rs '(.[0] * .[1]) | with_entries(select(.value |. != null))' package.json deploy.json > build/package.json"
             ]
         },
-        './build/README.md': {
+        'build/README.md': {
             dependencies: [
-                './README.md'
+                'README.md'
             ],
             run: [
                 "mkdir -p build",
                 "ln -f README.md build/README.md"
             ]
         },
+        'build/lib.*.d.ts': {
+            dependencies: ['lib/*.d.ts'],
+            run: [
+                "mkdir -p ${lib:-build}", // you can specify where you want the `*.d.ts` files with an environment variable: `lib=build/lib pnpm exec mkjson build/lib\*`
+                "ln -f lib/*.d.ts ${lib:-build}"
+            ]
+        },
         // phony targets
 
         pkg: {
             dependencies: [
-                './build/package.json',
-                './build/README.md'
+                'build/package.json',
+                'build/README.md'
             ],
             phony: true,
             run: [
@@ -116,18 +101,18 @@
         },
         all: {
             phony: true,
-            run: "$mkjson ./build/\\*"
+            run: "$mkjson build/\\*"
         },
         clean: {
             phony: true,
-            run: "rm -rf build node_modules *lock* .yarn-cache .pnpm* test/node_modules test/pnpm* test/.pnpm* test/*lock* test/.yarn-cache"
+            run: "rm -rf build node_modules test/node_modules *lock* *pnpm* *yarn*"
         },
         test: {
             dependencies: [
                 'build/test/*.js'
             ],
             phony: true,
-            run: "find ./build/test -iname \\*.js | xargs -d \\\\n -I {} bash -c 'PWD=$PWD/build/test node {} ; ./test/status.mjs $? {}'"
+            run: "find build/test -iname \\*.js | xargs -d \\\\n -I {} bash -c 'PWD=$PWD/build/test node {} ; test/status.mjs $? {}'"
         }
     }
 }
