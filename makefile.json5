@@ -40,18 +40,6 @@
             dependencies: ['src/index.ts'],
             run: "pnpm exec esbuild src/index.ts --outfile=build/index.js --bundle --sourcemap --platform=node --format=esm"
         },
-        'build/test/(import).js;build/test/(stateMgr).js;build/test/(msgChannel).js;build/test/(parse/lex).js;build/test/(parse/basic).js;build/test/(parse/lang).js;build/test/(rewindIter).js': {
-            dependencies: [
-                'test/*.ts'
-            ],
-            run: [
-                "pnpm --prefix test install",
-                "pnpm exec esbuild test/src/$target_0.ts --outfile=$PWD/build/test/$target_0.js --bundle --sourcemap --platform=node --format=esm"
-            ],
-            env: {
-                PWD: 'cd test 2>/dev/null ; echo $PWD' // change dir to test, regardless of whether we're already there
-            }
-        },
         'build/package.json': {
             dependencies: [
                 'package.json'
@@ -70,7 +58,7 @@
                 "ln -f README.md build/README.md"
             ]
         },
-        'build/lib.*.d.ts': {
+        'build/*.d.ts': {
             dependencies: ['lib/*.d.ts'],
             run: [
                 "mkdir -p ${lib:-build}", // you can specify where you want the `*.d.ts` files with an environment variable: `lib=build/lib pnpm exec mkjson build/lib\*`
@@ -105,14 +93,12 @@
         },
         clean: {
             phony: true,
-            run: "rm -rf build node_modules test/node_modules *lock* *pnpm* *yarn*"
+            run: "rm -rf build node_modules test/test test/node_modules *lock* *pnpm* *yarn* test/*lock* test/*pnpm* test/*yarn*"
         },
         test: {
-            dependencies: [
-                'build/test/*.js'
-            ],
             phony: true,
-            run: "find build/test -iname \\*.js | xargs -d \\\\n -I {} bash -c 'PWD=$PWD/build/test node {} ; test/status.mjs $? {}'"
+            run: "find test -iname \\*.js | xargs -d \\\\n -I {} bash -c 'node --enable-source-maps=true {} ; node status.mjs $? {}'",
+            cwd: './test'
         }
     }
 }

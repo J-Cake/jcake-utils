@@ -36,8 +36,8 @@ declare module "@j-cake/jcake-utils/parse" {
 
         maybe(...parser: Array<TokenMatcher<T> | ParserBuilder<T, K>>): ParserBuilder<T, K>,
 
-        exec(nextToken: AsyncIterator<Lex.Token<T>>): Promise<ASTNode<T, K>>
+        exec(nextToken: AsyncIterable<Lex.Token<T>>): Promise<ASTNode<T, K>>
     }
 
-    export function createParser<T extends string, K extends string>(name: K): ParserBuilder<T, K>;
+    export function createParser<T extends string, K extends string>(name: K, parse: (match: any) => any): ParserBuilder<T, K>;
 }

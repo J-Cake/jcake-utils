@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import chalk from 'chalk';
 import {Lex} from '@j-cake/jcake-utils/parse';
-import * as iter from '@j-cake/jcake-utils/iter'
+import {iter} from '@j-cake/jcake-utils/iter'
 
 const lexer = Lex.createLexer({
     comment: tok => tok.match(/^#.*/)?.[0],

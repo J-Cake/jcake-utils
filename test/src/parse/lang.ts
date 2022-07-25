@@ -1,4 +1,4 @@
-import Iter from '@j-cake/jcake-utils/iter';
+import {Iter} from '@j-cake/jcake-utils/iter';
 import {Lex, createParser, ParserBuilder} from '@j-cake/jcake-utils/parse';
 
 const lex = Lex.createLexer({

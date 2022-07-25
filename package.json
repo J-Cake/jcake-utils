@@ -13,7 +13,8 @@
     "typings": "lib",
     "scripts": {
         "build": "$npm_execpath exec mkjson rebuild",
-        "postinstall": "$npm_execpath --prefix test install && $npm_execpath exec mkjson all"
+        "postinstall": "$npm_execpath exec mkjson all && $npm_execpath --prefix test install && $npm_execpath test",
+        "test": "$npm_execpath mkjson test"
     },
     "dependencies": {
         "chalk": "latest",
