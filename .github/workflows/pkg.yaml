@@ -23,5 +23,5 @@ jobs:
       - run: pnpm run build
       - run: npm publish --access public --registry https://registry.npmjs.com
         working-directory: ./build
-      - run: npm publish --access public --registry https://npm.pkg.com
+      - run: npm publish --access public --registry https://npm.pkg.github.com
         working-directory: ./build
