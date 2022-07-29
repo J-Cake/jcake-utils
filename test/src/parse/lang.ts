@@ -20,32 +20,3 @@ const tokens = await Iter(lex([`fn main(argv, argc) {
 
 type T = typeof tokens extends AsyncIterable<Lex.Token<infer K>> ? K : never;
 type K = 'Value' | 'Literal' | 'ParenthesisedExpression' | 'Expression' | 'Statement' | 'Return' | 'Fn' | 'ArgList';
-
-// noinspection JSDuplicatedDeclaration
-var Expression: ParserBuilder<T, K> = null as any;
-var Value = createParser<T, K>('Value')
-    .oneOf(
-        createParser<T, K>('Literal').oneOf({type: 'int'}/* other literals */),
-        createParser<T, K>('ParenthesisedExpression').exactly({type: 'open', src: '('}, Expression, {
-            type: 'close',
-            src: ')'
-        })
-    )
-
-// noinspection JSDuplicatedDeclaration
-var Expression = createParser<T, K>('Expression')
-    .maybe(Value)
-    .repeat({type: 'operator'}, Value);
-
-var Statement = createParser<T, K>('Statement')
-    .oneOf(
-        createParser<T, K>('Return').exactly({type: 'keyword', src: 'ret'}, Expression),
-        /* other types of statements */
-    )
-
-var Fn = createParser<T, K>('Fn')
-    .exactly({type: 'keyword', src: 'fn'}, {type: 'open', src: '('})
-    .maybe(createParser<T, K>('ArgList').repeat({type: 'name'}))
-    .exactly({type: 'close', src: ')'}, {type: 'open', src: '{'})
-    .repeat(Statement)
-    .exactly({type: 'close', src: '}'})

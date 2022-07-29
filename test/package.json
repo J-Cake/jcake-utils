@@ -2,12 +2,10 @@
     "name": "test",
     "type": "module",
     "scripts": {
-        "postinstall": "$npm_execpath exec mkjson all"
+        "postinstall": "pnpm exec mkjson test/\\*",
+        "all": "find test -iname \\*.js | xargs -d \\\\n -I {} bash -c 'node --enable-source-maps=true {} ; node status.mjs $? {}'"
     },
     "dependencies": {
         "@j-cake/jcake-utils": "link:../build"
-    },
-    "devDependencies": {
-        "@j-cake/mkjson": "latest"
     }
 }

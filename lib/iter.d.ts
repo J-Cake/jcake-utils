@@ -48,5 +48,18 @@ declare module "@j-cake/jcake-utils/iter" {
     }
     export function IterSync<T>(iter: Iterable<T>): iterSync.Iter<T>;
 
+    export namespace RewindableIterator {
+        export function rewindableIterator<T>(iter: AsyncIterable<T>): RewindableAsyncIterator<T>
+        export type RewindableIteratorResult<T> = { done: false, value: T, checkpoint: number }
+            | { done: true, value: undefined, checkpoint: number };
+        export type RewindableAsyncIterator<T> = {
+            checkpoint(): number, // checkpoint number
+            rewind(checkpoint?: number): number,
+            next(): Promise<RewindableIteratorResult<T>>
+        };
+    }
+
+    export type RewindableAsyncIterable<T> = { [Symbol.asyncIterator]: () => RewindableIterator.RewindableAsyncIterator<T> }
+
     export { };
 }

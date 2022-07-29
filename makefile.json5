@@ -94,11 +94,6 @@
         clean: {
             phony: true,
             run: "rm -rf build node_modules test/test test/node_modules *lock* *pnpm* *yarn* test/*lock* test/*pnpm* test/*yarn*"
-        },
-        test: {
-            phony: true,
-            run: "find test -iname \\*.js | xargs -d \\\\n -I {} bash -c 'node --enable-source-maps=true {} ; node status.mjs $? {}'",
-            cwd: './test'
         }
     }
 }
