@@ -1,6 +1,7 @@
 {
     "name": "@j-cake/jcake-utils",
     "description": "A collection of utilities for everyday nodejs usage.",
+    "license": "MIT",
     "author": {
         "name": "J-Cake",
         "email": "jakieschneider13@gmail.com",
@@ -8,28 +9,13 @@
     },
     "repository": "https://github.com/J-Cake/jcake-utils",
     "type": "module",
-    "version": "v1.1.4",
+    "version": "v1.2.0-r0",
     "main": "./build/index.js",
     "typings": "lib",
     "scripts": {
-        "build:db": "esbuild src/db.ts --outfile=build/db.js --bundle --sourcemap --platform=node --format=esm",
-        "build:dbrepl": "esbuild src/repl.ts --outfile=build/dbrepl.js --bundle --sourcemap --platform=node --format=esm",
-        "build:args": "esbuild src/args.ts --outfile=build/args.js --bundle --sourcemap --platform=node --format=esm",
-        "build:iter": "esbuild src/iter.ts --outfile=build/iter.js --bundle --sourcemap --platform=node --format=esm",
-        "build:iterSync": "esbuild src/iter_sync.ts --outfile=build/iterSync.js --bundle --sourcemap --platform=node --format=esm",
-        "build:buffer": "esbuild src/buffer.ts --outfile=build/buffer.js --bundle --sourcemap --platform=node --format=esm",
-        "build:str": "esbuild src/strutil.ts --outfile=build/str.js --bundle --sourcemap --platform=node --format=esm",
-        "build:state": "esbuild src/stateMgr.ts --outfile=build/state.js --bundle --sourcemap --platform=node --format=esm",
-        "build:msg": "esbuild src/msgChannel.ts --outfile=build/msg.js --bundle --sourcemap --platform=node --format=esm",
-        "build:lib": "esbuild src/index.ts --outfile=build/index.js --bundle --sourcemap --platform=node --format=esm",
-        "build:_pkg": "cat package.json | jq -r '{name, version, type, typings, exports: .exports | map_values({types, default: .deploy})}' > build/package.json",
-        "build:_readme": "ln -f README.md build/README.md",
-        "build:_type": "mkdir -p build/lib ; cp -r lib/* build/lib",
-        "build:_test": "$npm_execpath --prefix test install && $npm_execpath --prefix test run build:all",
-        "repl": "node --enable-source-maps=true build/dbrepl.js",
-        "build": "cat package.json | jq -r '.scripts | keys_unsorted[] | select(. | startswith(\"build:\"))' | xargs -d \\\\n -I {} $npm_execpath run {}",
-        "test": "cat test/package.json | jq -r '.tests[]' | xargs -d \\\\n -I {} bash -c 'cd ./build/test && node {}'",
-        "clean": "rm -rf build node_modules *lock* .yarn-cache .pnpm* test/node_modules test/pnpm* test/.pnpm* test/*lock* test/.yarn-cache"
+        "build": "mkjson rebuild",
+        "postinstall": "mkjson all",
+        "test": "pnpm --prefix test install && pnpm --prefix test run all"
     },
     "dependencies": {
         "chalk": "latest",
@@ -38,11 +24,12 @@
     "devDependencies": {
         "@types/node": "latest",
         "@types/lodash": "latest",
+        "@j-cake/mkjson": "latest",
         "typescript": "latest",
         "esbuild": "latest"
     },
     "bin": {
-        "dbrepl": "build/dbrepl.js"
+        "dbrepl": "./build/dbrepl.js"
     },
     "typesVersions": {
         "*": {
@@ -54,54 +41,24 @@
             ]
         }
     },
-    "exports": {
-        ".": {
-            "types": "./build/lib/index.d.ts",
-            "default": "./build/index.js",
-            "deploy": "./index.js"
-        },
-        "./args": {
-            "types": "./lib/args.d.ts",
-            "default": "./build/args.js",
-            "deploy": "./args.js"
-        },
-        "./buffer": {
-            "types": "./lib/buffer.d.ts",
-            "default": "./build/buffer.js",
-            "deploy": "./buffer.js"
-        },
-        "./db": {
-            "types": "./lib/db.d.ts",
-            "default": "./build/db.js",
-            "deploy": "./db.js"
-        },
-        "./iter": {
-            "types": "./lib/iter.d.ts",
-            "default": "./build/iter.js",
-            "deploy": "./iter.js"
-        },
-        "./iterSync": {
-            "types": "./lib/iterSync.d.ts",
-            "default": "./build/iterSync.js",
-            "deploy": "./iterSync.js"
-        },
-        "./str": {
-            "types": "./lib/str.d.ts",
-            "default": "./build/string.js",
-            "deploy": "./string.js"
-        },
-        "./state": {
-            "types": "./lib/state.d.ts",
-            "default": "./build/state.js",
-            "deploy": "./state.js"
-        },
-        "./msg": {
-            "types": "./lib/msg.d.ts",
-            "default": "./build/msg.js",
-            "deploy": "./msg.js"
-        }
+    "imports": {
+        "#args": "./build/args.js",
+        "#buffer": "./build/buffer.js",
+        "#db": "./build/db.js",
+        "#io": "./build/io.js",
+        "#iter": "./build/iter.js",
+        "#state": "./build/state.js",
+        "#msg": "./build/msg.js"
     },
-    "publishConfig": {
-        "registry": "https://npm.pkg.github.com"
+    "exports": {
+        "./": "./build/index.js",
+        "./args": "./build/args.js",
+        "./buffer": "./build/buffer.js",
+        "./db": "./build/db.js",
+        "./io": "./build/io.js",
+        "./iter": "./build/iter.js",
+        "./state": "./build/state.js",
+        "./msg": "./build/msg.js",
+        "./parse": "./build/parse.js"
     }
 }

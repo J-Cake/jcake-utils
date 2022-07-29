@@ -4,10 +4,10 @@ import readline from 'node:readline';
 import chalk from 'chalk';
 import _ from 'lodash';
 
-import DB from './db';
-import * as strutil from './strutil';
-import * as iter from './iter';
-import buffer from './buffer';
+import DB from '#db';
+import {iter} from '#iter';
+import buffer from '#buffer';
+import {strutil} from '#parse';
 
 const rl = readline.createInterface(process.stdin, process.stdout);
 const q = (query: string) => new Promise<string>(ok => rl.question(query, ans => ok(ans)));

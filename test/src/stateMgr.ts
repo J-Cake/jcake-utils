@@ -12,5 +12,3 @@ assert.ok(mgr instanceof StateMgr);
 
 assert.equal(mgr.get().name, 'test');
 assert.equal(mgr.get(), mgr.setState());
-
-console.log(chalk.green('[Info]'), 'StateMgr test passed');

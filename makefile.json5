@@ -1,0 +1,99 @@
+{
+    targets: {
+        'build/args.js': {
+            dependencies: ['src/args/*.ts'],
+            run: "pnpm exec esbuild src/args/index.ts --outfile=build/args.js --bundle --sourcemap --platform=node --format=esm"
+        },
+        'build/buffer.js': {
+            dependencies: ['src/buffer/*.ts'],
+            run: "pnpm exec esbuild src/buffer/index.ts --outfile=build/buffer.js --bundle --sourcemap --platform=node --format=esm"
+        },
+        'build/db.js': {
+            dependencies: ['src/db/*.ts', 'build/iter.js', 'build/buffer.js'],
+            run: "pnpm exec esbuild src/db/index.ts --outfile=build/db.js --bundle --sourcemap --platform=node --format=esm"
+        },
+        'build/dbrepl.js': {
+            dependencies: ['src/db/*.ts', 'build/db.js', 'build/iter.js', 'build/buffer.js', 'build/parse.js'],
+            run: "pnpm exec esbuild src/db/repl.ts --outfile=build/dbrepl.js --bundle --sourcemap --platform=node --format=esm"
+        },
+        'build/io.js': {
+            dependencies: ['src/io/*.ts'],
+            run: "pnpm exec esbuild src/io/index.ts --outfile=build/io.js --bundle --sourcemap --platform=node --format=esm"
+        },
+        'build/iter.js': {
+            dependencies: ['src/iter/*.ts'],
+            run: "pnpm exec esbuild src/iter/index.ts --outfile=build/iter.js --bundle --sourcemap --platform=node --format=esm"
+        },
+        'build/msg.js': {
+            dependencies: ['src/msg/*.ts', 'build/state.js'],
+            run: "pnpm exec esbuild src/msg/index.ts --outfile=build/msg.js --bundle --sourcemap --platform=node --format=esm"
+        },
+        'build/parse.js': {
+            dependencies: ['src/parse/*.ts', 'build/iter.js'],
+            run: "pnpm exec esbuild src/parse/index.ts --outfile=build/parse.js --bundle --sourcemap --platform=node --format=esm"
+        },
+        'build/state.js': {
+            dependencies: ['src/state/*.ts'],
+            run: "pnpm exec esbuild src/state/index.ts --outfile=build/state.js --bundle --sourcemap --platform=node --format=esm"
+        },
+        'build/index.js': {
+            dependencies: ['src/index.ts'],
+            run: "pnpm exec esbuild src/index.ts --outfile=build/index.js --bundle --sourcemap --platform=node --format=esm"
+        },
+        'build/package.json': {
+            dependencies: [
+                'package.json'
+            ],
+            run: [
+                "mkdir -p build",
+                "jq -rs '(.[0] * .[1]) | with_entries(select(.value |. != null))' package.json deploy.json > build/package.json"
+            ]
+        },
+        'build/README.md': {
+            dependencies: [
+                'README.md'
+            ],
+            run: [
+                "mkdir -p build",
+                "ln -f README.md build/README.md"
+            ]
+        },
+        'build/*.d.ts': {
+            dependencies: ['lib/*.d.ts'],
+            run: [
+                "mkdir -p ${lib:-build}", // you can specify where you want the `*.d.ts` files with an environment variable: `lib=build/lib pnpm exec mkjson build/lib\*`
+                "ln -f lib/*.d.ts ${lib:-build}"
+            ]
+        },
+        // phony targets
+
+        pkg: {
+            dependencies: [
+                'build/package.json',
+                'build/README.md'
+            ],
+            phony: true,
+            run: [
+                "mkdir -p build",
+                "pnpm install",
+                "pnpm exec tsc -p tsconfig.json"
+            ]
+        },
+        rebuild: {
+            dependencies: [
+                'clean',
+                'pkg'
+            ],
+            phony: true,
+            run: "$mkjson all"
+        },
+        all: {
+            phony: true,
+            run: "$mkjson build/\\*"
+        },
+        clean: {
+            phony: true,
+            run: "rm -rf build node_modules test/test test/node_modules *lock* *pnpm* *yarn* test/*lock* test/*pnpm* test/*yarn*"
+        }
+    }
+}

@@ -7,13 +7,26 @@
         "resolveJsonModule": true,
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
+        "noImplicitAny": false,
         "rootDirs": ["src", "test"],
         "outDir": "build/ts",
         "declaration": true,
         "declarationDir": "build/def",
         "forceConsistentCasingInFileNames": true,
         "importHelpers": true,
-        "strict": true
+        "strict": true,
+        "baseUrl": "./src",
+        "paths": {
+            "#args": ["args/index.ts"],
+            "#buffer": ["buffer/index.ts"],
+            "#db": ["db/index.ts"],
+            "#io": ["io/index.ts"],
+            "#iter": ["iter/index.ts"],
+            "#msg": ["msg/index.ts"],
+            "#parse": ["parse/index.ts"],
+            "#state": ["state/index.ts"],
+
+        }
     },
     "exclude": ["build", "node_modules"],
 }

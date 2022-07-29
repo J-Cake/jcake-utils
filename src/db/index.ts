@@ -1,10 +1,10 @@
 import { promises as fs } from 'node:fs';
 import _ from 'lodash';
 
+import buffer from '#buffer';
+import {Iter, iter, iterSync}from '#iter';
+
 import { parsePTable } from './ptable';
-import buffer from './buffer';
-import * as iter from './iter';
-import Iter, * as iterSync from './iter_sync';
 
 export const fileHandles: fs.FileHandle[] = [];
 

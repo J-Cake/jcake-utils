@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/stateMgr.ts"],
+  "sourcesContent": ["import assert from 'node:assert';\nimport chalk from 'chalk';\nimport StateMgr from '@j-cake/jcake-utils/state';\n\nassert.equal(typeof StateMgr, 'function');\nassert.equal(typeof StateMgr.prototype.constructor, 'function');\n\nconst mgr = new StateMgr<{ name: string }>({ name: 'test' });\n\nassert.equal(typeof mgr, 'object');\nassert.ok(mgr instanceof StateMgr);\n\nassert.equal(mgr.get().name, 'test');\nassert.equal(mgr.get(), mgr.setState());\n"],
+  "mappings": ";AAAA,OAAO,YAAY;AAEnB,OAAO,cAAc;AAErB,OAAO,MAAM,OAAO,UAAU,UAAU;AACxC,OAAO,MAAM,OAAO,SAAS,UAAU,aAAa,UAAU;AAE9D,IAAM,MAAM,IAAI,SAA2B,EAAE,MAAM,OAAO,CAAC;AAE3D,OAAO,MAAM,OAAO,KAAK,QAAQ;AACjC,OAAO,GAAG,eAAe,QAAQ;AAEjC,OAAO,MAAM,IAAI,IAAI,EAAE,MAAM,MAAM;AACnC,OAAO,MAAM,IAAI,IAAI,GAAG,IAAI,SAAS,CAAC;",
+  "names": []
+}
