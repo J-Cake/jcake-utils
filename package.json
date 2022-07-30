@@ -9,7 +9,7 @@
     },
     "repository": "https://github.com/J-Cake/jcake-utils",
     "type": "module",
-    "version": "v1.2.0-r0",
+    "version": "v1.2.0-r1",
     "main": "./build/index.js",
     "typings": "lib",
     "scripts": {
