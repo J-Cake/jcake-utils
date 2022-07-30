@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../src/msgChannel.ts"],
-  "sourcesContent": ["import assert from 'node:assert';\nimport chalk from 'chalk';\nimport msgChannel from '@j-cake/jcake-utils/msg';\n\nassert.equal(typeof msgChannel, 'function');\n"],
-  "mappings": ";AAAA,OAAO,YAAY;AAEnB,OAAO,gBAAgB;AAEvB,OAAO,MAAM,OAAO,YAAY,UAAU;",
-  "names": []
-}

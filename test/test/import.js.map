@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../src/import.ts"],
-  "sourcesContent": ["import assert from 'node:assert';\nimport * as jcake from '@j-cake/jcake-utils';\n\nassert(typeof jcake == 'object');\n\nimport {iter} from '@j-cake/jcake-utils/iter';\n\nassert(typeof iter == 'object');\n"],
-  "mappings": ";AAAA,OAAO,YAAY;AACnB,YAAY,WAAW;AAIvB,SAAQ,YAAW;AAFnB,OAAO,OAAO,SAAS,QAAQ;AAI/B,OAAO,OAAO,QAAQ,QAAQ;",
-  "names": []
-}

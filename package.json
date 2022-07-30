@@ -60,5 +60,25 @@
         "./state": "./build/state.js",
         "./msg": "./build/msg.js",
         "./parse": "./build/parse.js"
+    },
+    "deploy": {
+        "dependencies": null,
+        "devDependencies": null,
+        "scripts": null,
+        "main": "./index.js",
+        "bin": {
+            "dbrepl": "./dbrepl.js"
+        },
+        "exports": {
+            ".": "./index.js",
+            "./args": "./args.js",
+            "./buffer": "./buffer.js",
+            "./db": "./db.js",
+            "./io": "./io.js",
+            "./iter": "./iter.js",
+            "./state": "./state.js",
+            "./msg": "./msg.js",
+            "./parse": "./parse.js"
+        }
     }
 }

@@ -46,7 +46,7 @@
             ],
             run: [
                 "mkdir -p build",
-                "jq -rs '(.[0] * .[1]) | with_entries(select(.value |. != null))' package.json deploy.json > build/package.json"
+                "cat package.json | jq -r '. * .deploy * {deploy:null} | with_entries(select(.value |. != null))' > build/package.json"
             ]
         },
         'build/README.md': {

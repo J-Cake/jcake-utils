@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../src/parse/lex.ts"],
-  "sourcesContent": ["import assert from 'node:assert';\nimport chalk from 'chalk';\nimport {Lex} from '@j-cake/jcake-utils/parse';\nimport {iter} from '@j-cake/jcake-utils/iter'\n\nconst lexer = Lex.createLexer({\n    comment: tok => tok.match(/^#.*/)?.[0],\n    newline: tok => tok.match(/^\\r?\\n/)?.[0]\n});\n\n\nconst tokens = await iter.collect(lexer(iter.from([\n    '#hello world',\n    'I actually continue into the next chunk\\n#next token',\n    'As do I'\n])));\n\nassert.equal(tokens.length, 3);\n// check token types\n"],
-  "mappings": ";AAAA,OAAO,YAAY;AAEnB,SAAQ,WAAU;AAClB,SAAQ,YAAW;AAEnB,IAAM,QAAQ,IAAI,YAAY;AAAA,EAC1B,SAAS,SAAO,IAAI,MAAM,MAAM,IAAI;AAAA,EACpC,SAAS,SAAO,IAAI,MAAM,QAAQ,IAAI;AAC1C,CAAC;AAGD,IAAM,SAAS,MAAM,KAAK,QAAQ,MAAM,KAAK,KAAK;AAAA,EAC9C;AAAA,EACA;AAAA,EACA;AACJ,CAAC,CAAC,CAAC;AAEH,OAAO,MAAM,OAAO,QAAQ,CAAC;",
-  "names": []
-}
