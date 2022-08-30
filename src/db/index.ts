@@ -1,10 +1,10 @@
-import { promises as fs } from 'node:fs';
+import {promises as fs} from 'node:fs';
 import _ from 'lodash';
 
 import buffer from '#buffer';
-import {Iter, iter, iterSync}from '#iter';
+import {Iter, iterSync} from '#iter';
 
-import { parsePTable } from './ptable';
+import {parsePTable} from './ptable';
 
 export const fileHandles: fs.FileHandle[] = [];
 
@@ -29,9 +29,9 @@ export type Value<Obj, selector extends Selector<Obj>> = selector extends [infer
     (key extends keyof Obj ? Obj[key] : never) :
     (selector extends [infer key, ...infer subkey] ?
         (key extends keyof Obj ? (
-            subkey extends Selector<Obj[key]> ?
-            Value<Obj[key], subkey> :
-            [key] extends Selector<Obj> ? Obj[key] : never) :
+                subkey extends Selector<Obj[key]> ?
+                    Value<Obj[key], subkey> :
+                    [key] extends Selector<Obj> ? Obj[key] : never) :
             never) : never);
 
 namespace parsers {
@@ -46,7 +46,9 @@ namespace parsers {
 
     type parserSerliaser<T> = { parse(buffer: Buffer): T, serialise(obj: T): Buffer };
     export type parserCombo = { [K in keyof typeof DBType]: parserSerliaser<any> };
-    interface parsers extends parserCombo { }
+
+    interface parsers extends parserCombo {
+    }
 
     export const parsers: parsers = {
         null: {
@@ -98,18 +100,39 @@ namespace parsers {
 export type KeyList = { [k in string]: k | KeyList };
 
 export default class DB<Database> {
-    private readonly file?: fs.FileHandle;
-    private readonly ptableSize?: number;
-    private readonly data_offset?: number;
-
     public static readonly BlockSize: number = 4096;
-
     public static autoDefine: boolean = true;
-
+    private file?: fs.FileHandle;
+    private ptableSize?: number;
+    private data_offset?: number;
     private readonly changes: Map<Selector<Database>, Buffer>;
+
+    constructor(public readonly ptable: Map<string, [start: number, end: number][]>) {
+        this.changes = new Map();
+    }
 
     public static getParsers() {
         return parsers;
+    }
+
+    static async load<Database>(file: fs.FileHandle): Promise<DB<Database>> {
+        const {buffer: header} = await file.read(Buffer.alloc(12), 0, 12);
+
+        if (header.slice(0, 4).toString() !== 'EDB\0')
+            throw `EDB Error: Invalid file header`;
+
+        const ptableLen = header.readUInt32BE(4);
+
+        const {buffer: ptableBuffer} = await file.read({buffer: Buffer.alloc(ptableLen), position: header.length});
+
+        fileHandles.push(file);
+
+        const db = new DB<Database>(await parsePTable(ptableBuffer));
+
+        db.file = file;
+        db.ptableSize = ptableLen;
+        db.data_offset = header.readUInt32BE(8);
+        return db;
     }
 
     public has<selector extends Selector<Database>>(selector: selector, where?: (i: selector) => any): boolean {
@@ -159,7 +182,7 @@ export default class DB<Database> {
         const keys = this.keys_flat(selector);
 
         const obj: KeyList = {};
-        for (const i of Iter(keys).map(i => i.split('.')))
+        for (const i of keys.map(i => i.split('.')))
             if (i.length - (selector as string[]).length > 1)
                 obj[i[(selector as string[]).length]] = this.keys(i.slice(0, (selector as string[]).length + 1) as selector);
             else
@@ -168,7 +191,7 @@ export default class DB<Database> {
         return obj;
     }
 
-    public async *get<selector extends Selector<Database>>(selector: selector): AsyncGenerator<Value<Database, selector> | null> {
+    public async* get<selector extends Selector<Database>>(selector: selector): AsyncGenerator<Value<Database, selector> | null> {
 
         const _selector = [...selector].map(i => (i as string).toString());
 
@@ -199,7 +222,7 @@ export default class DB<Database> {
             const groups: { [entry in string]: string[][] } = {};
             for (const [head, ...tail] of paths)
                 if (tail.length >= 1)
-                    groups[head] = Object.defineProperty(groups[head] ? [...groups[head]!, tail] : [tail], '__final', { enumerable: false, value: true, writable: false });
+                    groups[head] = Object.defineProperty(groups[head] ? [...groups[head]!, tail] : [tail], '__final', {enumerable: false, value: true, writable: false});
                 else {
                     let selector = `${parent}.${head}`;
 
@@ -248,7 +271,7 @@ export default class DB<Database> {
         return obj as Value<Database, selector>;
     }
 
-    public async *getRaw<selector extends Selector<Database>>(selector: selector, options: { maxChunkSize?: number, start?: number, end?: number }): AsyncGenerator<Buffer> {
+    public async* getRaw<selector extends Selector<Database>>(selector: selector, options: { maxChunkSize?: number, start?: number, end?: number }): AsyncGenerator<Buffer> {
         const _selector = [...selector].map(i => (i as string).toString());
 
         if (!this.file)
@@ -479,7 +502,6 @@ export default class DB<Database> {
         if (headerBuffer.length > headerBuffer.readUInt32BE(8)) // we'll use more bytes than we have buffer between the start of the data. We need to increase the buffer
             await this.resize(headerBuffer.length);
 
-        // @ts-ignore
         this.ptableSize = headerBuffer.length;
 
         await this.file!.write(headerBuffer, 0, headerBuffer.length, 0);
@@ -496,29 +518,29 @@ export default class DB<Database> {
         header.writeUInt32BE(newDataOffset, 8);
         // we're not actually resizing the header as that can be done relatively effortlessly, we're moving the data offset further away from the header.
 
-        await p(next => this.file!.createReadStream({ autoClose: false, start: this.data_offset! })
-            .pipe(newFile.createWriteStream({ autoClose: false, start: newDataOffset }))
+        await p(next => this.file!.createReadStream({autoClose: false, start: this.data_offset!})
+            .pipe(newFile.createWriteStream({autoClose: false, start: newDataOffset}))
             .once('finish', () => next()));
         await this.file!.truncate(await newFile.stat().then(s => s.size));
-        await p(next => newFile.createReadStream({ start: 0 })
-            .pipe(this.file!.createWriteStream({ autoClose: false, start: 0 }))
+        await p(next => newFile.createReadStream({start: 0})
+            .pipe(this.file!.createWriteStream({autoClose: false, start: 0}))
             .once('finish', () => next()));
 
-        Object.assign(this, { data_offset: newDataOffset });
-        newFile.close().catch(err => console.error(`lmao guess who I just stopped from crashing your program - why it\'s the garbage collector, having a go at you for not closing your files!\nYou're welcome.`)); // this bitch is not closing itself. There should be an `await` in front of it, but seriously, if the OS can't fucking close the file, then we ignore it. 
+        Object.assign(this, {data_offset: newDataOffset});
+        newFile.close().catch(err => console.error(`lmao guess who I just stopped from crashing your program - why it\'s the garbage collector, having a go at you for not closing your files!\nYou're welcome.`)); // this bitch is not closing itself. There should be an `await` in front of it, but seriously, if the OS can't fucking close the file, then we ignore it.
         /**
          * For context, when resizing a database file, there's a very real chance that the data section is too large to fit in memory. So you can't resize by just copying and splicing buffers,
          * what happens, is we take the header of the original database, and write it to the new file. We then copy the data section from the original into the new file, making any adjustments necessary to it
-         * Once done, we can then copy the new file back into the original, and the databse has been resized. 
+         * Once done, we can then copy the new file back into the original, and the databse has been resized.
          * Now, good practice says that once we're finished with a file, we should close its file descriptor, so that the OS can free up memory etc. That's what the `newFile.close()` is supposed to do,
-         * The issue is that if we `await` the closure of the file, for some reason that I can't seem to work out, the `close` call hangs indefinitely. 
+         * The issue is that if we `await` the closure of the file, for some reason that I can't seem to work out, the `close` call hangs indefinitely.
          * If we were to `await` it, we'd be waiting for, well, forever. So by removing the `await`, we *hopefully* can use Node's threadpool to call the `close` function truly asyncronously and continue on while that happens in the backgruond.
-         * The irony here is, that NodeJS will bitch about leaving file descriptors to be closed by the GC. So when we reach the end of the function, the GC cleans it up and alerts of a bad practice. 
-         * Which we had to do, because the function doesn't work. 
-        *  
-        * 4 hours that took me. 4 hours.
-        * FML. The life of a programmer :/
-        */
+         * The irony here is, that NodeJS will bitch about leaving file descriptors to be closed by the GC. So when we reach the end of the function, the GC cleans it up and alerts of a bad practice.
+         * Which we had to do, because the function doesn't work.
+         *
+         * 4 hours that took me. 4 hours.
+         * FML. The life of a programmer :/
+         */
     }
 
     private getAllInodes(): [start: number, end: number][] {
@@ -539,9 +561,9 @@ export default class DB<Database> {
 
         // generate list of gaps between inodes
         const inodeGaps = _.chain(_.chain(inodes.slice(1))
-            .reduce((a, i) => ({ prev: i, acc: a.acc.concat(diff(i, a.prev)) }), { prev: inodes[0], acc: [] as number[] })
+            .reduce((a, i) => ({prev: i, acc: a.acc.concat(diff(i, a.prev))}), {prev: inodes[0], acc: [] as number[]})
             .value().acc)
-            .map((i, a) => ({ inode: a, gapSize: i }))
+            .map((i, a) => ({inode: a, gapSize: i}))
             .filter(i => i.gapSize > 0)
             .sortBy(i => i.gapSize)
             .value();
@@ -553,7 +575,7 @@ export default class DB<Database> {
             const new_inodes: [start: number, end: number][] = [];
 
             let total: number = 0;
-            for (const { inode, gapSize } of gaps) {                  // if we don't need all available space in the gap, we reduce it
+            for (const {inode, gapSize} of gaps) {                  // if we don't need all available space in the gap, we reduce it
                 new_inodes.push([inodes[inode][1], inodes[inode][1] + Math.min(size - total, gapSize)]);
                 total += gapSize;
             }
@@ -621,27 +643,5 @@ export default class DB<Database> {
             throw new Error(`Invalid type encountered: ${type}\n(${buffer.length}) ${Array.from(buffer.slice(0, 0xf)).map(i => i.toString(16)).join(' ').toUpperCase()}`);
 
         return parsers.parsers[parsers.DBType[type] as keyof parsers.parserCombo].parse(buffer.slice(1));
-    }
-
-    constructor(public readonly ptable: Map<string, [start: number, end: number][]>) {
-        this.changes = new Map();
-    }
-
-    static async load<Database>(file: fs.FileHandle): Promise<DB<Database>> {
-        const { buffer: header } = await file.read(Buffer.alloc(12), 0, 12);
-
-        if (header.slice(0, 4).toString() !== 'EDB\0')
-            throw `EDB Error: Invalid file header`;
-
-        const ptableLen = header.readUInt32BE(4);
-
-        const { buffer: ptableBuffer } = await file.read({ buffer: Buffer.alloc(ptableLen), position: header.length });
-
-        fileHandles.push(file);
-
-        const db = new DB<Database>(await parsePTable(ptableBuffer));
-        // @ts-ignore
-        db.file = file; db.ptableSize = ptableLen; db.data_offset = header.readUInt32BE(8);
-        return db;
     }
 }

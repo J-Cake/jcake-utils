@@ -48,7 +48,8 @@
         "#io": "./build/io.js",
         "#iter": "./build/iter.js",
         "#state": "./build/state.js",
-        "#msg": "./build/msg.js"
+        "#msg": "./build/msg.js",
+        "#parse": "./build/parse.js"
     },
     "exports": {
         "./": "./build/index.js",

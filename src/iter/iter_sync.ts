@@ -87,25 +87,25 @@ export function* range(start: number, end: number, step: number = 1): Generator<
         yield i;
 }
 
-interface Iter<T> extends Iterable<T> {
-    map<R>(predicate: (i: T, a: number) => R): Iter<R>;
-    filter(predicate: (i: T, a: number) => boolean): Iter<T>;
-    filtermap<R>(predicate: (i: T, a: number) => MaybeFalsy<R>): Iter<R>;
-    concat(...iter: Iterable<T>[]): Iter<T>;
-    peekable(): Iter<{current: T, skip: () => T}>;
+export interface IterTools<T> extends Iterable<T> {
+    map<R>(predicate: (i: T, a: number) => R): IterTools<R>;
+    filter(predicate: (i: T, a: number) => boolean): IterTools<T>;
+    filtermap<R>(predicate: (i: T, a: number) => MaybeFalsy<R>): IterTools<R>;
+    concat(...iter: Iterable<T>[]): IterTools<T>;
+    peekable(): IterTools<{current: T, skip: () => T}>;
     collect(): T[];
-    flat(): Iter<Flat<T>>;
+    flat(): IterTools<Flat<T>>;
 }
 
-export default function Iter<T>(iter: Iterable<T>): Iter<T> {
+export default function Iter<T>(iter: Iterable<T>): IterTools<T> {
     return {
         [Symbol.iterator]: () => iter[Symbol.iterator](),
-        map: <R>(predicate: (i: T, a: number) => R): Iter<R> => Iter(map(iter, predicate)),
-        filter: (predicate: (i: T, a: number) => boolean): Iter<T> => Iter(filter(iter, predicate)),
-        filtermap: <R>(predicate: (i: T, a: number) => MaybeFalsy<R>): Iter<R> => Iter(filtermap(iter, predicate)),
-        concat: (...iters: Iterable<T>[]): Iter<T> => Iter(concat(iter, ...iters)),
-        peekable: (): Iter<{current: T, skip: () => T}> => Iter(peekable(iter)),
+        map: <R>(predicate: (i: T, a: number) => R): IterTools<R> => Iter(map(iter, predicate)),
+        filter: (predicate: (i: T, a: number) => boolean): IterTools<T> => Iter(filter(iter, predicate)),
+        filtermap: <R>(predicate: (i: T, a: number) => MaybeFalsy<R>): IterTools<R> => Iter(filtermap(iter, predicate)),
+        concat: (...iters: Iterable<T>[]): IterTools<T> => Iter(concat(iter, ...iters)),
+        peekable: (): IterTools<{current: T, skip: () => T}> => Iter(peekable(iter)),
         collect: (): T[] => collect(iter),
-        flat: (): Iter<Flat<T>> => Iter(flat(iter))
+        flat: (): IterTools<Flat<T>> => Iter(flat(iter))
     }
 }

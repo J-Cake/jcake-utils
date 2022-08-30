@@ -12,32 +12,24 @@ declare module "@j-cake/jcake-utils/parse" {
         }
 
         export type StringStream = AsyncIterable<any & { toString(): string }> | Iterable<any & { toString(): string }>;
-        export type Lexer<T extends string> = (input: StringStream) => AsyncIterable<Token<T>>
+        export type Lexer<T extends string> = (input: StringStream) => import('@j-cake/jcake-utils/iter').iter.IterTools<Token<T>>
 
         export function createLexer<T extends string>(matchers: Record<T, (tok: string) => Nullable<string>>, origin?: string): Lexer<T>
     }
 
-    export type ASTNode<T extends string, K extends string> = {
-        type: K,
-        tokens: Lex.Token<T>[]
-    }
-
-    type TokenMatcher<T extends string> = {
-        type?: T,
+    type Matcher<T extends string> = {
+        type?: T | T[],
         src?: string
-    };
+    } | string;
 
-    export interface ParserBuilder<T extends string, K extends string> {
-        exactly(...parser: Array<TokenMatcher<T> | ParserBuilder<T, K>>): ParserBuilder<T, K>,
+    export interface ParserBuilder<T extends string> {
+        sequence(...grammar: Matcher<T>[]): ParserBuilder<T>,
+        oneOf(...grammar: Matcher<T>[]): ParserBuilder<T>,
+        repeat(...grammar: Matcher<T>[]): ParserBuilder<T>,
+        optional(grammar: Matcher<T>[]): ParserBuilder<T>,
 
-        oneOf(...parser: Array<TokenMatcher<T> | ParserBuilder<T, K>>): ParserBuilder<T, K>,
-
-        repeat(...parser: Array<TokenMatcher<T> | ParserBuilder<T, K>>): ParserBuilder<T, K>,
-
-        maybe(...parser: Array<TokenMatcher<T> | ParserBuilder<T, K>>): ParserBuilder<T, K>,
-
-        exec(nextToken: AsyncIterable<Lex.Token<T>>): Promise<ASTNode<T, K>>
+        exec(iter: AsyncIterable<Lex.Token<T>>): Promise<void> // TODO: Decide on return type
     }
 
-    export function createParser<T extends string, K extends string>(name: K, parse: (match: any) => any): ParserBuilder<T, K>;
+    export function createParser<T extends string>(name: string): ParserBuilder<T>;
 }

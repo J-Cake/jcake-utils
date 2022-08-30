@@ -119,28 +119,28 @@ export async function* awaitIter<T>(iter: AsyncIterable<T>): AsyncGenerator<Awai
 
 type Flat<T> = T extends AsyncIterable<infer K> ? K : T extends Iterable<infer K> ? K : T;
 
-interface Iter<T> extends AsyncIterable<T> {
-    map<R>(predicate: (i: T, a: number) => R): Iter<R>;
-    filter(predicate: (i: T, a: number) => boolean): Iter<T>;
-    concat(...iter: (AsyncIterable<T> | Iterable<T>)[]): Iter<T>;
-    flat(): Iter<Flat<T>>;
-    interleave(...iter: AsyncIterable<T>[]): Iter<T>;
-    await(): Iter<Awaited<T>>;
+export interface IterTools<T> extends AsyncIterable<T> {
+    map<R>(predicate: (i: T, a: number) => R): IterTools<R>;
+    filter(predicate: (i: T, a: number) => boolean): IterTools<T>;
+    concat(...iter: (AsyncIterable<T> | Iterable<T>)[]): IterTools<T>;
+    flat(): IterTools<Flat<T>>;
+    interleave(...iter: AsyncIterable<T>[]): IterTools<T>;
+    await(): IterTools<Awaited<T>>;
     collect(): Promise<T[]>;
 }
 
-export default function Iter<T>(iter: AsyncIterable<T> | Iterable<T>): Iter<T> {
+export default function Iter<T>(iter: AsyncIterable<T> | Iterable<T>): IterTools<T> {
     const _iter: AsyncIterable<T> = from(iter);
 
     return {
         [Symbol.asyncIterator]: () => _iter[Symbol.asyncIterator](),
 
-        map: <R>(predicate: (i: T, a: number) => R): Iter<R> => Iter(map(_iter, predicate)),
-        filter: (predicate: (i: T, a: number) => boolean): Iter<T> => Iter(filter(_iter, predicate)),
-        concat: (...iters: (AsyncIterable<T> | Iterable<T>)[]): Iter<T> => Iter(concat(_iter, ...iters)),
-        flat: (): Iter<Flat<T>> => Iter(flat(_iter)),
-        interleave: (...iters: AsyncIterable<T>[]): Iter<T> => Iter(interleave(_iter, ...iters)),
-        await: (): Iter<Awaited<T>> => Iter(awaitIter(_iter)),
+        map: <R>(predicate: (i: T, a: number) => R): IterTools<R> => Iter(map(_iter, predicate)),
+        filter: (predicate: (i: T, a: number) => boolean): IterTools<T> => Iter(filter(_iter, predicate)),
+        concat: (...iters: (AsyncIterable<T> | Iterable<T>)[]): IterTools<T> => Iter(concat(_iter, ...iters)),
+        flat: (): IterTools<Flat<T>> => Iter(flat(_iter)),
+        interleave: (...iters: AsyncIterable<T>[]): IterTools<T> => Iter(interleave(_iter, ...iters)),
+        await: (): IterTools<Awaited<T>> => Iter(awaitIter(_iter)),
         collect: async (): Promise<T[]> => await collect(_iter),
     };
 }

@@ -8,3 +8,4 @@ test/package-lock.json
 *lock*
 *yarn*
 *pnpm*
+/test/test/
