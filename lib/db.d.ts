@@ -83,3 +83,7 @@ declare module "@j-cake/jcake-utils/db" {
     export { };
 
 }
+
+declare module "#db" {
+    export * from '@j-cake/jcake-utils/db';
+}

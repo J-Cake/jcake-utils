@@ -1,4 +1,4 @@
-import { Iter, iter, iterSync } from '#iter';
+import {Iter, iter, iterSync} from '#iter';
 
 /* Streaming lexer:
  * Streaming tokens is tricky because a lexer needs to be able handle cases where the token is valid, but other matches exist, but require looking further ahead.
@@ -15,7 +15,7 @@ import { Iter, iter, iterSync } from '#iter';
 // 2. run buffered string through matcher list
 // 3. emit longest match
 
-export type Nullable<T> = T | undefined | null;
+export type Nullable<T> = T | void | undefined | null;
 
 export interface Token<T extends string = string, Tok extends string = string> {
     type: T,
@@ -27,11 +27,10 @@ export interface Token<T extends string = string, Tok extends string = string> {
 }
 
 export type StringStream = AsyncIterable<any & { toString(): string }>;
-export type Lexer<T extends string> = (input: StringStream) => AsyncIterator<Token<T>>
+export type Lexer<T extends string> = (input: StringStream) => iter.IterTools<Token<T>>
 
 export function createLexer<T extends string>(matchers: Record<T, (tok: string) => Nullable<string>>, origin?: string): Lexer<T> {
-
-    return async function*(input: StringStream | string): AsyncGenerator<Token<T>> {
+    const lex = async function* (input: StringStream | string): AsyncGenerator<Token<T>> {
         let tokenBuffer: string = '';
         let charIndex: number = 0;
 
@@ -77,6 +76,18 @@ export function createLexer<T extends string>(matchers: Record<T, (tok: string) 
         }
 
     };
+
+    return (stream: StringStream | string) => Iter(lex(stream));
+}
+
+export function isToken<T extends string>(obj: any): obj is Token<T> {
+    return !(typeof obj !== 'object'
+        || typeof obj['type'] !== 'string'
+        || typeof obj['src'] !== 'string'
+        || typeof obj['charIndex'] !== 'number'
+        || typeof obj['line'] !== 'number'
+        || typeof obj['char'] !== 'number'
+        || !(['undefined', 'string'].includes(typeof obj['origin'])));
 }
 
 export default createLexer;

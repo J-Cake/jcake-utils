@@ -14,8 +14,8 @@
     "typings": "lib",
     "scripts": {
         "build": "mkjson rebuild",
-        "postinstall": "mkjson all",
-        "test": "pnpm --prefix test install && pnpm --prefix test run all"
+        "postinstall": "mkjson build/*.js build/*.d.ts build/+\n",
+        "test": "pnpm --prefix test --silent install && echo && pnpm --prefix test --silent run all"
     },
     "dependencies": {
         "chalk": "latest",
@@ -24,7 +24,6 @@
     "devDependencies": {
         "@types/node": "latest",
         "@types/lodash": "latest",
-        "@j-cake/mkjson": "latest",
         "typescript": "latest",
         "esbuild": "latest"
     },
@@ -70,6 +69,7 @@
         "bin": {
             "dbrepl": "./dbrepl.js"
         },
+        "imports": null,
         "exports": {
             ".": "./index.js",
             "./args": "./args.js",

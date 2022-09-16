@@ -1,31 +1,11 @@
 {
     env: {
-        esbuild_options: "echo --bundle --sourcemap --platform=node --format=esm --external:@j-cake/jcake-utils"
+        esbuild_options: "echo --bundle --sourcemap --platform=node --format=esm --external:@j-cake/jcake-utils",
     },
     targets: {
-        'test/import.js': {
-            dependencies: ['src/import.ts'],
-            run: "pnpm exec esbuild src/import.ts --outfile=test/import.js $esbuild_options"
-        },
-        'test/state.js': {
-            dependencies: ['src/stateMgr.ts'],
-            run: "pnpm exec esbuild src/stateMgr.ts --outfile=test/state.js $esbuild_options"
-        },
-        'test/msg.js': {
-            dependencies: ['src/msgChannel.ts'],
-            run: "pnpm exec esbuild src/msgChannel.ts --outfile=test/msg.js $esbuild_options"
-        },
-        'test/parse/basic.js': {
-            dependencies: ['src/parse/basic.ts'],
-            run: "pnpm exec esbuild src/parse/basic.ts --outfile=test/parse/basic.js $esbuild_options"
-        },
-        'test/parse/lex.js': {
-            dependencies: ['src/parse/lex.ts'],
-            run: "pnpm exec esbuild src/parse/lex.ts --outfile=test/parse/lex.js $esbuild_options"
-        },
-        'test/parse/lang.js': {
-            dependencies: ['src/parse/lang.ts'],
-            run: "pnpm exec esbuild src/parse/lang.ts --outfile=test/parse/lang.js $esbuild_options"
+        'test/*.js': {
+            dependencies: ['src/\\1.ts'],
+            run: "esbuild \"src/$target_1.ts\" \"--outfile=test/$target_1.js\" $esbuild_options",
         }
     }
 }

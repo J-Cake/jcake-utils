@@ -17,3 +17,7 @@ declare module "@j-cake/jcake-utils/state" {
     }
     
 }
+
+// declare module "#state" {
+//     export * from '@j-cake/jcake-utils/state';
+// }

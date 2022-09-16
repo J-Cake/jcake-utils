@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 
-import {RewindableIterator} from "@j-cake/jcake-utils/iter";
+import {rewindableIterator} from "@j-cake/jcake-utils/iter";
 
 const number = async function*(): AsyncGenerator<number> {
     let i = 0;
@@ -9,7 +9,7 @@ const number = async function*(): AsyncGenerator<number> {
         yield i++;
 };
 
-const iter = RewindableIterator.rewindableIterator(number());
+const iter = rewindableIterator(number());
 
 for (let i = 0; i < 10; i++)
     await iter.next(); // increment by 10

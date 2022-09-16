@@ -11,7 +11,7 @@
         "rootDirs": ["src", "test"],
         "outDir": "build/ts",
         "declaration": true,
-        "declarationDir": "build/def",
+        "declarationDir": "build/lib",
         "forceConsistentCasingInFileNames": true,
         "importHelpers": true,
         "strict": true,

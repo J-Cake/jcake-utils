@@ -2,10 +2,11 @@
     "name": "test",
     "type": "module",
     "scripts": {
-        "postinstall": "pnpm exec mkjson test/\\*",
-        "all": "find test -iname \\*.js | xargs -d \\\\n -I {} bash -c 'node --enable-source-maps=true {} ; node status.mjs $? {}'"
+        "postinstall": "find src -iname *.ts | sed -e 's/ts$/js/g' -e 's/src/test/' | xargs -d \\\\n mkjson -m makefile.json5",
+        "all": "find test -iname \\*.js | xargs -d \\\\n -I {} bash -c 'node run-test.mjs {}' ; if [ $? -eq 0 ]; then echo \"\\e[32m\u2713\\e[0m All tests passed\"; else echo \"\\e[31m\u2715\\e[0m Some tests failed\"; fi"
     },
-    "dependencies": {
-        "@j-cake/jcake-utils": "link:../build"
+    "devDependencies": {
+        "@j-cake/jcake-utils": "link:../build",
+        "esbuild": "latest"
     }
 }

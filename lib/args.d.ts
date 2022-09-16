@@ -35,3 +35,7 @@ declare module "@j-cake/jcake-utils/args" {
     export { };
 
 }
+
+declare module "#args" {
+    export * from '@j-cake/jcake-utils/args';
+}

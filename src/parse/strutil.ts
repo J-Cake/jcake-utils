@@ -2,7 +2,7 @@ import _ from "lodash";
 
 export function splitTop(token: string, delimiter: string): string[] {
     let b = 0;
-    const segments = [];
+    const segments: string[] = [];
 
     segments.push([...token].reduce(function (acc, i) {
         const tok = acc + i;

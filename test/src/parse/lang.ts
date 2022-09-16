@@ -1,5 +1,5 @@
 import {Iter} from '@j-cake/jcake-utils/iter';
-import {Lex, createParser, ParserBuilder} from '@j-cake/jcake-utils/parse';
+import {Lex} from '@j-cake/jcake-utils/parse';
 
 const lex = Lex.createLexer({
     open: tok => ['(', '[', '{'].find(i => tok.startsWith(i)),
@@ -13,7 +13,7 @@ const lex = Lex.createLexer({
     whitespace: tok => tok.match(/^;?\s+/)?.[0]
 });
 
-const tokens = await Iter(lex([`fn main(argv, argc) {
+const tokens = Iter(lex([`fn main(argv, argc) {
     ret 0 + 10
 }`]))
     .filter(i => i.type !== 'whitespace' || i.src.includes(';'));

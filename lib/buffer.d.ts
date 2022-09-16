@@ -13,3 +13,7 @@ declare module "@j-cake/jcake-utils/buffer" {
     };
 
 }
+
+declare module "#buffer" {
+    export * from '@j-cake/jcake-utils/buffer';
+}

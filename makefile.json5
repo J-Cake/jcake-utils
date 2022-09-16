@@ -1,46 +1,49 @@
 {
+    env: {
+        esbuild_options: "if [ ! -z $env ]; then echo --bundle --platform=node --format=esm --minify; else echo --bundle --sourcemap --platform=node --format=esm; fi"
+    },
     targets: {
-        'build/args.js': {
+        '#/build/args.js': {
             dependencies: ['src/args/*.ts'],
-            run: "pnpm exec esbuild src/args/index.ts --outfile=build/args.js --bundle --sourcemap --platform=node --format=esm"
+            run: "pnpm exec esbuild src/args/index.ts --outfile=build/args.js $esbuild_options"
         },
-        'build/buffer.js': {
+        '#/build/buffer.js': {
             dependencies: ['src/buffer/*.ts'],
-            run: "pnpm exec esbuild src/buffer/index.ts --outfile=build/buffer.js --bundle --sourcemap --platform=node --format=esm"
+            run: "pnpm exec esbuild src/buffer/index.ts --outfile=build/buffer.js $esbuild_options"
         },
-        'build/db.js': {
-            dependencies: ['src/db/*.ts', 'build/iter.js', 'build/buffer.js'],
-            run: "pnpm exec esbuild src/db/index.ts --outfile=build/db.js --bundle --sourcemap --platform=node --format=esm"
+        '#/build/db.js': {
+            dependencies: ['src/db/*.ts', '#/build/iter.js', '#/build/buffer.js'],
+            run: "pnpm exec esbuild src/db/index.ts --outfile=build/db.js $esbuild_options"
         },
-        'build/dbrepl.js': {
-            dependencies: ['src/db/*.ts', 'build/db.js', 'build/iter.js', 'build/buffer.js', 'build/parse.js'],
-            run: "pnpm exec esbuild src/db/repl.ts --outfile=build/dbrepl.js --bundle --sourcemap --platform=node --format=esm"
+        '#/build/dbrepl.js': {
+            dependencies: ['src/db/*.ts', '#/build/db.js', '#/build/iter.js', '#/build/buffer.js', '#/build/parse.js'],
+            run: "pnpm exec esbuild src/db/repl.ts --outfile=build/dbrepl.js $esbuild_options"
         },
-        'build/io.js': {
+        '#/build/io.js': {
             dependencies: ['src/io/*.ts'],
-            run: "pnpm exec esbuild src/io/index.ts --outfile=build/io.js --bundle --sourcemap --platform=node --format=esm"
+            run: "pnpm exec esbuild src/io/index.ts --outfile=build/io.js $esbuild_options"
         },
-        'build/iter.js': {
+        '#/build/iter.js': {
             dependencies: ['src/iter/*.ts'],
-            run: "pnpm exec esbuild src/iter/index.ts --outfile=build/iter.js --bundle --sourcemap --platform=node --format=esm"
+            run: "pnpm exec esbuild src/iter/index.ts --outfile=build/iter.js $esbuild_options"
         },
-        'build/msg.js': {
-            dependencies: ['src/msg/*.ts', 'build/state.js'],
-            run: "pnpm exec esbuild src/msg/index.ts --outfile=build/msg.js --bundle --sourcemap --platform=node --format=esm"
+        '#/build/msg.js': {
+            dependencies: ['src/msg/*.ts', '#/build/state.js'],
+            run: "pnpm exec esbuild src/msg/index.ts --outfile=build/msg.js $esbuild_options"
         },
-        'build/parse.js': {
-            dependencies: ['src/parse/*.ts', 'build/iter.js'],
-            run: "pnpm exec esbuild src/parse/index.ts --outfile=build/parse.js --bundle --sourcemap --platform=node --format=esm"
+        '#/build/parse.js': {
+            dependencies: ['src/parse/*.ts', '#/build/iter.js'],
+            run: "pnpm exec esbuild src/parse/index.ts --outfile=build/parse.js $esbuild_options"
         },
-        'build/state.js': {
+        '#/build/state.js': {
             dependencies: ['src/state/*.ts'],
-            run: "pnpm exec esbuild src/state/index.ts --outfile=build/state.js --bundle --sourcemap --platform=node --format=esm"
+            run: "pnpm exec esbuild src/state/index.ts --outfile=build/state.js $esbuild_options"
         },
-        'build/index.js': {
+        '#/build/index.js': {
             dependencies: ['src/index.ts'],
-            run: "pnpm exec esbuild src/index.ts --outfile=build/index.js --bundle --sourcemap --platform=node --format=esm"
+            run: "pnpm exec esbuild src/index.ts --outfile=build/index.js $esbuild_options"
         },
-        'build/package.json': {
+        '#/build/package.json': {
             dependencies: [
                 'package.json'
             ],
@@ -49,7 +52,7 @@
                 "cat package.json | jq -r '. * .deploy * {deploy:null} | with_entries(select(.value |. != null))' > build/package.json"
             ]
         },
-        'build/README.md': {
+        '#/build/README.md': {
             dependencies: [
                 'README.md'
             ],
@@ -58,7 +61,7 @@
                 "ln -f README.md build/README.md"
             ]
         },
-        'build/*.d.ts': {
+        '#/build/*.d.ts': {
             dependencies: ['lib/*.d.ts'],
             run: [
                 "mkdir -p ${lib:-build}", // you can specify where you want the `*.d.ts` files with an environment variable: `lib=build/lib pnpm exec mkjson build/lib\*`
@@ -69,8 +72,8 @@
 
         pkg: {
             dependencies: [
-                'build/package.json',
-                'build/README.md'
+                '#/build/package.json',
+                '#/build/README.md'
             ],
             phony: true,
             run: [
@@ -85,15 +88,11 @@
                 'pkg'
             ],
             phony: true,
-            run: "$mkjson all"
-        },
-        all: {
-            phony: true,
-            run: "$mkjson build/\\*"
+            run: "$mkjson build/*.js build/*.d.ts build/+\n"
         },
         clean: {
             phony: true,
-            run: "rm -rf build node_modules test/test test/node_modules *lock* *pnpm* *yarn* test/*lock* test/*pnpm* test/*yarn*"
+            run: "cat .gitignore | xargs -d \\\\n -I {} sh -c 'rm -rf {}'"
         }
     }
 }
