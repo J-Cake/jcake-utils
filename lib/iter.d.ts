@@ -10,6 +10,7 @@ declare module "@j-cake/jcake-utils/iter" {
         export function from<T>(iter: AsyncIterable<T> | Iterable<T>): AsyncGenerator<T>;
         export function interleave<T>(...iter: AsyncIterable<T>[]): AsyncGenerator<T>;
         export function awaitIter<T>(iter: AsyncIterable<T>): AsyncGenerator<Awaited<T>>;
+        export function pipe<T, R, Options extends any[]>(iterator: AsyncIterable<T> | Iterable<T>, generator: (input: AsyncIterable<T> | Iterable<T>, ...options: Options) => AsyncIterable<R>, ...options: Options): AsyncGenerator<R>;
         type Flat<T> = T extends AsyncIterable<infer K> ? K : T extends Iterable<infer K> ? K : T;
         interface Iter<T> extends AsyncIterable<T> {
             map<R>(predicate: (i: T, a: number) => R): Iter<R>;
@@ -19,6 +20,7 @@ declare module "@j-cake/jcake-utils/iter" {
             interleave(...iter: AsyncIterable<T>[]): Iter<T>;
             await(): Iter<Awaited<T>>
             collect(): Promise<T[]>;
+            pipe<R, Options extends any[]>(generator: (iter: AsyncIterable<T> | Iterable<T>, ...options: Options) => AsyncIterable<R>, ...options: Options): Iter<R>
         }
     }
     export function Iter<T>(iter: AsyncIterable<T> | Iterable<T>): iter.Iter<T>;
@@ -34,6 +36,7 @@ declare module "@j-cake/jcake-utils/iter" {
         export function collect<T>(iter: Iterable<T>): T[];
         export function flat<T>(...iter: Iterable<T>[]): Generator<Flat<T>>;
         export function peekable<T>(iterator: Iterable<T>): Generator<{ current: T, skip: () => T }>;
+        export function pipe<T, R, Options extends any[]>(iterator: Iterable<T>, generator: (input: Iterable<T>, ...options: Options) => Iterable<R>, ...options: Options): Generator<R>;
         type Flat<T> = T extends Iterable<infer K> ? K : T;
         export function range(start: number, end: number, step?: number): Generator<number>;
         interface Iter<T> extends Iterable<T> {
@@ -44,6 +47,7 @@ declare module "@j-cake/jcake-utils/iter" {
             peekable(): Iter<{ current: T, skip: () => T }>;
             collect(): T[];
             flat(): Iter<Flat<T>>;
+            pipe<R, Options extends any[]>(generator: (iter: Iterable<T>, ...options: Options) => Iterable<R>, ...options: Options): Iter<R>;
         }
     }
     export function IterSync<T>(iter: Iterable<T>): iterSync.Iter<T>;
