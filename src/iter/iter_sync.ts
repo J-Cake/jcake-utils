@@ -80,6 +80,11 @@ export function* peekable<T>(iterator: Iterable<T>): Generator<{ current: T, ski
         yield { current: i.value, skip: () => (i = iter.next()).value };
 }
 
+export function* pipe<T, R, Options extends any[]>(iterator: Iterable<T>, generator: (input: Iterable<T>, ...options: Options) => Iterable<R>, ...options: Options): Generator<R> {
+    for (const i of generator(iterator, ...options))
+        yield i;
+}
+
 type Flat<T> = T extends Iterable<infer K> ? K : T;
 
 export function* range(start: number, end: number, step: number = 1): Generator<number> {
@@ -95,6 +100,7 @@ interface Iter<T> extends Iterable<T> {
     peekable(): Iter<{current: T, skip: () => T}>;
     collect(): T[];
     flat(): Iter<Flat<T>>;
+    pipe<R, Options extends any[]>(generator: (iter: Iterable<T>, ...options: Options) => Iterable<R>, ...options: Options): Iter<R>
 }
 
 export default function Iter<T>(iter: Iterable<T>): Iter<T> {
@@ -106,6 +112,7 @@ export default function Iter<T>(iter: Iterable<T>): Iter<T> {
         concat: (...iters: Iterable<T>[]): Iter<T> => Iter(concat(iter, ...iters)),
         peekable: (): Iter<{current: T, skip: () => T}> => Iter(peekable(iter)),
         collect: (): T[] => collect(iter),
-        flat: (): Iter<Flat<T>> => Iter(flat(iter))
+        flat: (): Iter<Flat<T>> => Iter(flat(iter)),
+        pipe: <R, Options extends any[]>(generator: (iter: Iterable<T>, ...options: Options) => Iterable<R>, ...options: Options): Iter<R> => Iter(pipe(iter, generator, ...options))
     }
 }

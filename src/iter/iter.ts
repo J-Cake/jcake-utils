@@ -117,6 +117,11 @@ export async function* awaitIter<T>(iter: AsyncIterable<T>): AsyncGenerator<Awai
         yield await i;
 }
 
+export async function* pipe<T, R, Options extends any[]>(iterator: AsyncIterable<T> | Iterable<T>, generator: (input: AsyncIterable<T> | Iterable<T>, ...options: Options) => AsyncIterable<R>, ...options: Options): AsyncGenerator<R> {
+    for await (const i of generator(iterator, ...options))
+        yield i;
+}
+
 type Flat<T> = T extends AsyncIterable<infer K> ? K : T extends Iterable<infer K> ? K : T;
 
 interface Iter<T> extends AsyncIterable<T> {
@@ -127,6 +132,7 @@ interface Iter<T> extends AsyncIterable<T> {
     interleave(...iter: AsyncIterable<T>[]): Iter<T>;
     await(): Iter<Awaited<T>>;
     collect(): Promise<T[]>;
+    pipe<R, Options extends any[]>(generator: (iter: AsyncIterable<T> | Iterable<T>, ...options: Options) => AsyncIterable<R>, ...options: Options): Iter<R>
 }
 
 export default function Iter<T>(iter: AsyncIterable<T> | Iterable<T>): Iter<T> {
@@ -142,5 +148,6 @@ export default function Iter<T>(iter: AsyncIterable<T> | Iterable<T>): Iter<T> {
         interleave: (...iters: AsyncIterable<T>[]): Iter<T> => Iter(interleave(_iter, ...iters)),
         await: (): Iter<Awaited<T>> => Iter(awaitIter(_iter)),
         collect: async (): Promise<T[]> => await collect(_iter),
+        pipe: <R, Options extends any[]>(generator: (iter: AsyncIterable<T> | Iterable<T>, ...options: Options) => AsyncIterable<R>, ...options: Options): Iter<R> => Iter(pipe(iter, generator, ...options))
     };
 }

@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 
-import RewindableIterator from "../../src/RewindIterable";
+import RewindableIterator from "../../src/iter/RewindIterable";
 
 const number = async function*(): AsyncGenerator<number> {
     let i = 0;
